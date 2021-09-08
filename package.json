@@ -17,14 +17,15 @@
   },
   "homepage": "https://github.com/indigotech/onboard-angelo-antolini#readme",
   "dependencies": {
-    "apollo-server": "^3.3.0",
-    "graphql": "^15.5.2",
-    "ts-node": "^10.2.1"
+    "apollo-server": "3.3.0",
+    "graphql": "15.5.2",
+    "prettier": "2.3.2",
+    "ts-node": "10.2.1"
   },
   "devDependencies": {
-    "@typescript-eslint/eslint-plugin": "^4.30.0",
-    "@typescript-eslint/parser": "^4.30.0",
-    "eslint": "^7.32.0",
-    "typescript": "^4.4.2"
+    "@typescript-eslint/eslint-plugin": "4.31.0",
+    "@typescript-eslint/parser": "4.31.0",
+    "eslint": "7.32.0",
+    "typescript": "4.4.2"
   }
 }

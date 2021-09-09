@@ -32,7 +32,8 @@
       "@typescript-eslint/eslint-plugin": "4.31.0",
       "@typescript-eslint/parser": "4.31.0",
       "eslint": "7.32.0",
-      "typescript": "3.3.3333",
-      "ts-node": "3.3.0"
+      "eslint-plugin-prettier": "4.0.0",
+      "ts-node": "3.3.0",
+      "typescript": "3.3.3333"
    }
 }

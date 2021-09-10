@@ -15,5 +15,5 @@ export class User extends BaseEntity {
   password: string;
 
   @Column()
-  birthdate: string;
+  birthDate: string;
 }

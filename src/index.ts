@@ -6,15 +6,7 @@ import { typeDefs } from './schema';
 import { resolvers } from './resolver';
 
 const startServer = async () => {
-  await createConnection({
-    type: 'postgres',
-    host: 'localhost',
-    port: 5432,
-    username: 'postgres',
-    password: 'postgres',
-    database: 'local',
-    entities: [`${__dirname}/entity/*.ts`],
-  });
+  await createConnection();
 
   const server = new ApolloServer({ typeDefs, resolvers });
   server.listen().then(({ url }) => {

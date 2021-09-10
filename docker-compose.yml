@@ -5,7 +5,7 @@ localdb:
   volumes:
     - ./db/dumps:/app-db-dumps
   environment:
-    - POSTGRES_USER=postgres
+    - POSTGRES_USER=local
     - POSTGRES_PASSWORD=postgres
     - POSTGRES_DB=local
 

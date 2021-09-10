@@ -1,9 +1,11 @@
-// Construct a schema, using GraphQL schema language
 import { gql } from 'apollo-server';
 
 export const typeDefs = gql`
+  type Query {
+    hello: String!
+  }
   type Mutation {
-    addUser(name: String!, email: String!, password: String!, birthDate: String!): boolean!
+    createUser(name: String!, email: String!, password: String!, birthDate: String!): outputUser
   }
 
   type inputUser {
@@ -14,7 +16,7 @@ export const typeDefs = gql`
   }
 
   type outputUser {
-    id: Number!
+    id: Int!
     name: String!
     email: String!
     birthDate: String!

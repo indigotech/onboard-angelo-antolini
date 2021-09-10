@@ -1,18 +1,20 @@
 import { User } from './entity/User';
 
 export const resolvers = {
+  Query: {
+    hello: (): string => {
+      return 'hello world';
+    },
+  },
   Mutation: {
-    addUser: async (_, { name, email, password, birthDate }) => {
-      const storeUser = {
+    createUser: async (_: string, { name, email, password, birthDate }) => {
+      const user = {
         id: 12,
         name,
         email,
-        password,
         birthDate,
       };
-
-      User.create(storeUser);
-      return true;
+      return user;
     },
   },
 };

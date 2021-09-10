@@ -1,22 +1,20 @@
-import { gql } from 'apollo-server';
+// Construct a schema, using GraphQL schema language
+import { gql } from 'apollo-server-express';
 
 export const typeDefs = gql`
-    type Mutation {
-        createUser(input: UserInput): User
-    }
-
-    type UserInput{
-        name: string;
-        email: string;
-        password: string;
-        birthdate: string
-    }
-
-    type User{
-        id:number;
-        name: string;
-        email: string;
-        birthdate: string
-    }
-
-    `;
+  type Mutation {
+    createUser(input: inputUser): outputUser!
+  }
+  type inputUser {
+    name: String!
+    email: String!
+    password: String!
+    birthDate: String!
+  }
+  type outputUser {
+    id: Number!
+    name: String!
+    email: String!
+    birthDate: String!
+  }
+`;

@@ -8,7 +8,7 @@ import { resolvers } from './resolver';
 const startServer = async () => {
   await createConnection();
 
-  const server = new ApolloServer({ typeDefs });
+  const server = new ApolloServer({ typeDefs, resolvers });
   server.listen().then(({ url }) => {
     console.log(`Server running on ${url}`);
   });

@@ -15,14 +15,14 @@ export const resolvers = {
       user.password = Password;
       user.birthDate = BirthDate;
 
+      const response = await getRepository(User).save(user);
+
       const outputUser = {
         Name,
         Email,
         BirthDate,
-        id: user.id,
+        Id: response.id,
       };
-
-      await getRepository(User).save(user);
 
       return outputUser;
     },

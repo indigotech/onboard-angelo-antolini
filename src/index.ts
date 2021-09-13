@@ -4,7 +4,6 @@ import { ApolloServer } from 'apollo-server';
 
 import { typeDefs } from './schema';
 import { resolvers } from './resolver';
-import { url } from 'inspector';
 
 const startServer = async () => {
   await createConnection().catch((error) => console.log(error));

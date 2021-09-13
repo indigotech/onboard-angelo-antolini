@@ -1,6 +1,5 @@
 import { User } from './entity/User';
 import { getRepository } from 'typeorm';
-import { get } from 'http';
 
 export const resolvers = {
   Query: {

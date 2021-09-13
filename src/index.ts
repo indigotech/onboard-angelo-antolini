@@ -6,7 +6,7 @@ import { typeDefs } from './schema';
 import { resolvers } from './resolver';
 
 const startServer = async () => {
-  await createConnection().catch((error) => console.log(error));
+  await createConnection();
   console.log('connection with database OK');
 
   const server = new ApolloServer({ typeDefs, resolvers });

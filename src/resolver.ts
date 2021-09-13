@@ -8,19 +8,23 @@ export const resolvers = {
     },
   },
   Mutation: {
-    createUser: async (_: string, { name, email, password, birthDate }) => {
+    createUser: async (_: string, { Name, Email, Password, BirthDate }) => {
       const user = new User();
-      user.name = name;
-      user.email = email;
-      user.password = password;
-      user.birthDate = birthDate;
-      console.log('user criation OK');
-      console.log(user.id);
+      user.name = Name;
+      user.email = Email;
+      user.password = Password;
+      user.birthDate = BirthDate;
+
+      const outputUser = {
+        Name,
+        Email,
+        BirthDate,
+        id: user.id,
+      };
 
       await getRepository(User).save(user);
 
-      console.log(`User saved with the id: ${user.id}`);
-      return true;
+      return outputUser;
     },
   },
 };

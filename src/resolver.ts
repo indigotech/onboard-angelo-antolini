@@ -9,22 +9,45 @@ export const resolvers = {
   },
   Mutation: {
     createUser: async (_: string, { Name, Email, Password, BirthDate }) => {
+      const repository = getRepository(User);
+
       const user = new User();
       user.name = Name;
       user.email = Email;
       user.password = Password;
       user.birthDate = BirthDate;
 
-      const response = await getRepository(User).save(user);
+      let validPasswordLength = true;
+      let validPasswordLetter = true;
+      let validPasswordNumber = true;
+      let validEmail = true;
 
-      const outputUser = {
-        Name,
-        Email,
-        BirthDate,
-        Id: response.id,
-      };
+      user.password.length < 7 ? (validPasswordLength = false) : validPasswordLength;
+      user.password.search(/[0-9]/) == -1 ? (validPasswordNumber = false) : validPasswordNumber;
+      user.password.search(/[a-z]/) == -1 && user.password.search(/[A-Z]/) == -1
+        ? (validPasswordLetter = false)
+        : validPasswordLetter;
 
-      return outputUser;
+      const sameEmail = await repository.find({ email: user.email });
+      sameEmail.length == 0 ? validEmail : (validEmail = false);
+
+      if (validEmail && validPasswordLength && validPasswordLetter && validPasswordNumber) {
+        const response = await repository.save(user);
+
+        const outputUser = {
+          Name,
+          Email,
+          BirthDate,
+          Id: response.id,
+        };
+
+        return outputUser;
+      } else {
+        const failUser = {
+          Name: 'Invalid User',
+        };
+        return failUser;
+      }
     },
   },
 };

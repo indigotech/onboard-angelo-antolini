@@ -5,7 +5,7 @@
    "username": "angeloantolini",
    "password": "Skimboard159753",
    "database": "First-docker",
-   "synchronize": true,
+   "synchronize": false,
    "logging": false,
    "entities": [
       "src/entity/**/*.ts"

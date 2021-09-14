@@ -7,11 +7,11 @@ import { resolvers } from './resolver';
 
 const startServer = async () => {
   await createConnection();
+  console.log('connection with database OK');
 
   const server = new ApolloServer({ typeDefs, resolvers });
-  server.listen().then(({ url }) => {
-    console.log(`Server running on ${url}`);
-  });
+  const { url } = await server.listen();
+  console.log(`Server running on: ${url}`);
 };
 
 startServer();

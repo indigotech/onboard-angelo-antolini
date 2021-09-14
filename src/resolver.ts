@@ -1,5 +1,6 @@
 import { User } from './entity/User';
 import { getRepository } from 'typeorm';
+import { UserInputError, ApolloError } from 'apollo-server';
 
 export const resolvers = {
   Query: {
@@ -8,23 +9,38 @@ export const resolvers = {
     },
   },
   Mutation: {
-    createUser: async (_: string, { Name, Email, Password, BirthDate }) => {
+    createUser: async (_: string, { name, email, password, birthDate }) => {
+      const repository = getRepository(User);
+
       const user = new User();
-      user.name = Name;
-      user.email = Email;
-      user.password = Password;
-      user.birthDate = BirthDate;
+      user.name = name;
+      user.email = email;
+      user.password = password;
+      user.birthDate = birthDate;
 
-      const response = await getRepository(User).save(user);
+      let validPassword = true;
+      let validEmail = true;
+      const sameEmail = await repository.find({ email: user.email });
 
-      const outputUser = {
-        Name,
-        Email,
-        BirthDate,
-        Id: response.id,
-      };
+      if (user.password.length < 7) {
+        validPassword = false;
+      } else if (user.password.search(/[0-9]/) == -1) {
+        validPassword = false;
+      } else if (user.password.search(/[a-z]/) == -1 && user.password.search(/[A-Z]/) == -1) {
+        validPassword = false;
+      } else if (sameEmail.length !== 0) {
+        validEmail = false;
+      }
 
-      return outputUser;
+      if (validPassword && validEmail) {
+        const response = await repository.save(user);
+
+        return response;
+      } else if (validEmail == false) {
+        throw new UserInputError('Já existe um usuário com este e-mail');
+      } else if (validPassword == false) {
+        throw new UserInputError('Senha inválida');
+      }
     },
   },
 };

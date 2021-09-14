@@ -6,6 +6,7 @@ import { typeDefs } from './schema';
 import { resolvers } from './resolver';
 
 export const startServer = async () => {
+  console.log('ol]=', process.env.DATABASE_URL);
   await createConnection({
     type: 'postgres',
     url: process.env.DATABASE_URL,

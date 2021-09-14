@@ -39,8 +39,7 @@ export const resolvers = {
         const hashPassword = await hash(originalPassword, saltRounds);
 
         user.password = hashPassword;
-        const response = await repository.save(user);
-
+        const response = await repository.save(user);{
         const outputUser = {
           Name,
           Email,
@@ -49,7 +48,8 @@ export const resolvers = {
         };
 
         return outputUser;
-      } else if (validEmail == false) {
+        }
+      }else if (validEmail == false) {
         throw new UserInputError('Já existe um usuário com este e-mail');
       } else if (validPassword == false) {
         throw new UserInputError('Senha inválida');

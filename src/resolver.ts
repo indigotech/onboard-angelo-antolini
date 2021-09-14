@@ -17,21 +17,20 @@ export const resolvers = {
       user.password = Password;
       user.birthDate = BirthDate;
 
-      let validPasswordLength = true;
-      let validPasswordLetter = true;
-      let validPasswordNumber = true;
-      let validEmail = true;
-
-      user.password.length < 7 ? (validPasswordLength = false) : validPasswordLength;
-      user.password.search(/[0-9]/) == -1 ? (validPasswordNumber = false) : validPasswordNumber;
-      user.password.search(/[a-z]/) == -1 && user.password.search(/[A-Z]/) == -1
-        ? (validPasswordLetter = false)
-        : validPasswordLetter;
-
+      let validInput = true;
       const sameEmail = await repository.find({ email: user.email });
-      sameEmail.length == 0 ? validEmail : (validEmail = false);
 
-      if (validEmail && validPasswordLength && validPasswordLetter && validPasswordNumber) {
+      if (user.password.length < 7) {
+        validInput = false;
+      } else if (user.password.search(/[0-9]/) == -1) {
+        validInput = false;
+      } else if (user.password.search(/[a-z]/) == -1 && user.password.search(/[A-Z]/) == -1) {
+        validInput = false;
+      } else if (sameEmail.length !== 0) {
+        validInput = false;
+      }
+
+      if (validInput) {
         const response = await repository.save(user);
 
         const outputUser = {
@@ -43,10 +42,7 @@ export const resolvers = {
 
         return outputUser;
       } else {
-        const failUser = {
-          Name: 'Invalid User',
-        };
-        return failUser;
+        console.error('Usuário Inválido');
       }
     },
   },

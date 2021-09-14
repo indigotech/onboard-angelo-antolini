@@ -1,4 +1,5 @@
 import { User } from './entity/User';
+import { getRepository } from 'typeorm';
 
 export const resolvers = {
   Query: {
@@ -7,14 +8,23 @@ export const resolvers = {
     },
   },
   Mutation: {
-    createUser: async (_: string, { name, email, password, birthDate }) => {
-      const user = {
-        id: 12,
-        name,
-        email,
-        birthDate,
+    createUser: async (_: string, { Name, Email, Password, BirthDate }) => {
+      const user = new User();
+      user.name = Name;
+      user.email = Email;
+      user.password = Password;
+      user.birthDate = BirthDate;
+
+      const response = await getRepository(User).save(user);
+
+      const outputUser = {
+        Name,
+        Email,
+        BirthDate,
+        Id: response.id,
       };
-      return user;
+
+      return outputUser;
     },
   },
 };

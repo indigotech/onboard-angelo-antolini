@@ -1,6 +1,7 @@
 import { User } from './entity/User';
 import { getRepository } from 'typeorm';
-import { UserInputError, ApolloError } from 'apollo-server';
+import { UserInputError } from 'apollo-server';
+import { hash } from 'bcrypt';
 
 export const resolvers = {
   Query: {
@@ -13,26 +14,32 @@ export const resolvers = {
       const repository = getRepository(User);
 
       const user = new User();
+
       user.name = name;
       user.email = email;
-      user.password = password;
       user.birthDate = birthDate;
 
       let validPassword = true;
       let validEmail = true;
-      const sameEmail = await repository.find({ email: user.email });
 
-      if (user.password.length < 7) {
+      const sameEmail = await repository.find({ email: user.email });
+      const originalPassword = password;
+
+      if (originalPassword.length < 7) {
         validPassword = false;
-      } else if (user.password.search(/[0-9]/) == -1) {
+      } else if (originalPassword.search(/[0-9]/) == -1) {
         validPassword = false;
-      } else if (user.password.search(/[a-z]/) == -1 && user.password.search(/[A-Z]/) == -1) {
+      } else if (originalPassword.search(/[a-z]/) == -1 && originalPassword.search(/[A-Z]/) == -1) {
         validPassword = false;
       } else if (sameEmail.length !== 0) {
         validEmail = false;
       }
 
       if (validPassword && validEmail) {
+        const saltRounds = 10;
+        const hashPassword = await hash(originalPassword, saltRounds);
+
+        user.password = hashPassword;
         const response = await repository.save(user);
 
         return response;

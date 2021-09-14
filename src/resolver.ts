@@ -1,5 +1,6 @@
 import { User } from './entity/User';
 import { getRepository } from 'typeorm';
+import { UserInputError, ApolloError } from 'apollo-server';
 
 export const resolvers = {
   Query: {
@@ -17,20 +18,21 @@ export const resolvers = {
       user.password = Password;
       user.birthDate = BirthDate;
 
-      let validInput = true;
+      let validPassword = true;
+      let validEmail = true;
       const sameEmail = await repository.find({ email: user.email });
 
       if (user.password.length < 7) {
-        validInput = false;
+        validPassword = false;
       } else if (user.password.search(/[0-9]/) == -1) {
-        validInput = false;
+        validPassword = false;
       } else if (user.password.search(/[a-z]/) == -1 && user.password.search(/[A-Z]/) == -1) {
-        validInput = false;
+        validPassword = false;
       } else if (sameEmail.length !== 0) {
-        validInput = false;
+        validEmail = false;
       }
 
-      if (validInput) {
+      if (validPassword && validEmail) {
         const response = await repository.save(user);
 
         const outputUser = {
@@ -41,8 +43,10 @@ export const resolvers = {
         };
 
         return outputUser;
-      } else {
-        console.error('Usuário Inválido');
+      } else if (validEmail == false) {
+        throw new UserInputError('Já existe um usuário com este e-mail');
+      } else if (validPassword == false) {
+        throw new UserInputError('Senha inválida');
       }
     },
   },

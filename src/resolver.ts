@@ -9,14 +9,14 @@ export const resolvers = {
     },
   },
   Mutation: {
-    createUser: async (_: string, { Name, Email, Password, BirthDate }) => {
+    createUser: async (_: string, { name, email, password, birthDate }) => {
       const repository = getRepository(User);
 
       const user = new User();
-      user.name = Name;
-      user.email = Email;
-      user.password = Password;
-      user.birthDate = BirthDate;
+      user.name = name;
+      user.email = email;
+      user.password = password;
+      user.birthDate = birthDate;
 
       let validPassword = true;
       let validEmail = true;
@@ -35,14 +35,7 @@ export const resolvers = {
       if (validPassword && validEmail) {
         const response = await repository.save(user);
 
-        const outputUser = {
-          Name,
-          Email,
-          BirthDate,
-          Id: response.id,
-        };
-
-        return outputUser;
+        return response;
       } else if (validEmail == false) {
         throw new UserInputError('Já existe um usuário com este e-mail');
       } else if (validPassword == false) {

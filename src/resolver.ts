@@ -10,19 +10,19 @@ export const resolvers = {
     },
   },
   Mutation: {
-    createUser: async (_: string, { Name, Email, Password, BirthDate }) => {
+    createUser: async (_: string, { name, email, password, birthDate }) => {
       const repository = getRepository(User);
 
       const user = new User();
-      user.name = Name;
-      user.email = Email;
-      user.birthDate = BirthDate;
+      user.name = name;
+      user.email = email;
+      user.birthDate = birthDate;
 
       let validPassword = true;
       let validEmail = true;
 
       const sameEmail = await repository.find({ email: user.email });
-      const originalPassword = Password;
+      const originalPassword = password;
 
       if (originalPassword.length < 7) {
         validPassword = false;
@@ -39,17 +39,11 @@ export const resolvers = {
         const hashPassword = await hash(originalPassword, saltRounds);
 
         user.password = hashPassword;
-        const response = await repository.save(user);{
-        const outputUser = {
-          Name,
-          Email,
-          BirthDate,
-          Id: response.id,
-        };
-
-        return outputUser;
+        const response = await repository.save(user);
+        {
+          return response;
         }
-      }else if (validEmail == false) {
+      } else if (validEmail == false) {
         throw new UserInputError('Já existe um usuário com este e-mail');
       } else if (validPassword == false) {
         throw new UserInputError('Senha inválida');

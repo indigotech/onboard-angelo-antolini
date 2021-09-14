@@ -4,7 +4,7 @@
    "description": "Projeto Onboard",
    "main": "index.js",
    "scripts": {
-      "test": "echo \"Error: no test specified\" && exit 1",
+      "test": "ts-node src/teste/index.ts",
       "start": "ts-node src/index.ts"
    },
    "repository": {
@@ -36,6 +36,7 @@
       "eslint-plugin-prettier": "4.0.0",
       "mocha": "9.1.1",
       "prettier": "2.3.2",
+      "supertest": "^6.1.6",
       "ts-node": "10.2.1",
       "typescript": "4.4.2"
    }

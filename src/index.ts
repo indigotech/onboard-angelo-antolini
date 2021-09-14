@@ -1,17 +1,6 @@
-import 'reflect-metadata';
-import { createConnection } from 'typeorm';
-import { ApolloServer } from 'apollo-server';
+import { startServer } from './setup';
+import * as dotenv from 'dotenv';
 
-import { typeDefs } from './schema';
-import { resolvers } from './resolver';
-
-const startServer = async () => {
-  await createConnection();
-  console.log('connection with database OK');
-
-  const server = new ApolloServer({ typeDefs, resolvers });
-  const { url } = await server.listen();
-  console.log(`Server running on: ${url}`);
-};
+dotenv.config();
 
 startServer();

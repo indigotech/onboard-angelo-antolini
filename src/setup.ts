@@ -9,6 +9,7 @@ export const startServer = async () => {
   await createConnection({
     type: 'postgres',
     url: process.env.DATABASE_URL,
+    entities: ['src/entity/**/*.ts'],
   });
   console.log('connection with database OK');
 

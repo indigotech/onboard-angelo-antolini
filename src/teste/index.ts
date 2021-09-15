@@ -1,17 +1,22 @@
 import * as dotenv from 'dotenv';
 import { startServer } from '../setup';
-import request = require('supertest');
-import { resolvers } from '../resolver';
+import supertest = require('supertest');
+import { expect } from 'chai';
 
 before(async () => {
   dotenv.config({ path: `${__dirname}/../../teste.env` });
   await startServer();
-  console.log('Conexão estabelecida');
 });
+
+const queryRequest = (query: string) => {
+  return supertest(`http://localhost:${process.env.PORT}`).post('/').send({
+    query,
+  });
+};
 
 describe('Query test', function () {
   it('should query Hello', async () => {
-    //request(startServer).get('/').query({ val: 'hello' }).expect('hello world');
-    console.log('ok');
+    const hello = await queryRequest(`query { hello }`);
+    expect(hello.body.data.hello).to.equal('hello world');
   });
 });

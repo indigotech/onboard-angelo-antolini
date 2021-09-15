@@ -16,7 +16,7 @@ const queryRequest = (query: string) => {
 
 describe('Query test', function () {
   it('should query Hello', async () => {
-    const hello = await queryRequest(`query { hello }`);
-    expect(hello.body.data.hello).to.equal('hello world');
+    const query = await queryRequest(`query { hello }`);
+    expect(query.body.data.hello).to.equal('hello world');
   });
 });

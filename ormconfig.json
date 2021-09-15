@@ -5,7 +5,7 @@
    "username": "local",
    "password": "postgres",
    "database": "local",
-   "synchronize": false,
+   "synchronize": true,
    "logging": false,
    "entities": [
       "src/entity/**/*.ts"

@@ -31,8 +31,8 @@ export const resolvers = {
         validPassword = false;
       } else if (originalPassword.search(/[a-z]/) == -1 && originalPassword.search(/[A-Z]/) == -1) {
         validPassword = false;
-      } else if (sameEmail.length !== 0) {
-        validEmail = false;
+        // } else if (sameEmail.length !== 0) {
+        //   validEmail = false;
       }
 
       if (validPassword && validEmail) {
@@ -43,8 +43,8 @@ export const resolvers = {
         const response = await repository.save(user);
 
         return response;
-      } else if (validEmail == false) {
-        throw new UserInputError('Já existe um usuário com este e-mail');
+        // } else if (validEmail == false) {
+        //   throw new UserInputError('Já existe um usuário com este e-mail');
       } else if (validPassword == false) {
         throw new UserInputError('Senha inválida');
       }

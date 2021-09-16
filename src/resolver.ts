@@ -3,6 +3,9 @@ import { getRepository } from 'typeorm';
 import { UserInputError } from 'apollo-server';
 import { hash } from 'bcrypt';
 import { CustomError } from './errors';
+import jwt = require('jsonwebtoken');
+
+const token = jwt.sign({ username: 'permission' }, 'supersecret', { expiresIn: 120 });
 
 export const resolvers = {
   Login: {
@@ -10,7 +13,7 @@ export const resolvers = {
       return parents;
     },
     token: () => {
-      return 'token';
+      return token;
     },
   },
   Query: {

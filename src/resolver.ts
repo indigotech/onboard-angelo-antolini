@@ -4,6 +4,9 @@ import { compare, hash } from 'bcrypt';
 import { CustomError } from './errors';
 import { LonginInput, UserInput } from './schema-types';
 import { sign, verify } from 'jsonwebtoken';
+import jwt = require('jsonwebtoken');
+
+const token = jwt.sign({ username: 'permission' }, 'supersecret', { expiresIn: 120 });
 
 export const resolvers = {
   Login: {
@@ -11,7 +14,7 @@ export const resolvers = {
       return parents;
     },
     token: () => {
-      return 'token';
+      return token;
     },
   },
   Query: {

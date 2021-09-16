@@ -6,6 +6,14 @@ import { LonginInput, UserInput } from './schema-types';
 import { sign, verify } from 'jsonwebtoken';
 
 export const resolvers = {
+  Login: {
+    user: (parents, args) => {
+      return parents;
+    },
+    token: () => {
+      return 'token';
+    },
+  },
   Query: {
     user: async (_, { id }) => {
       const repository = getRepository(User);
@@ -101,15 +109,6 @@ export const resolvers = {
 
       const token = sign(`${userData.id}`, 'supersecret');
       return { user: userData, token: token };
-    },
-    login: async (_: string, { email, password }) => {
-      const repository = getRepository(User);
-      console.log(email);
-      const userData = await repository.findOne({ email });
-      console.log(userData);
-      if (userData.password == password) {
-        return userData;
-      }
     },
   },
 };

@@ -9,13 +9,19 @@ export const typeDefs = gql`
     createUser(data: UserInput): outputUser!
 =======
     createUser(name: String!, email: String!, password: String!, birthDate: String!): outputUser!
-    login(email: String!, password: String): outputUser!
+    login(email: String!, password: String!): Login
   }
 
+<<<<<<< HEAD
   type login {
     user(email: String!, password: String!): outputUser
     token(validation: Boolean!): String
 >>>>>>> c4a35ea... inicio do login
+=======
+  type Login {
+    user: outputUser
+    token: String
+>>>>>>> 0d473c0... integration with database
   }
 
   type outputUser {

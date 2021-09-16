@@ -3,8 +3,17 @@ import { getRepository } from 'typeorm';
 import { hash } from 'bcrypt';
 import { CustomError } from './errors';
 import { UserInput } from './schema-types';
+import { UserInputError } from 'apollo-server';
 
 export const resolvers = {
+  Login: {
+    user: (parents, args) => {
+      return parents;
+    },
+    token: () => {
+      return 'token';
+    },
+  },
   Query: {
     hello: (): string => {
       return 'hello world';
@@ -57,11 +66,13 @@ export const resolvers = {
     },
     login: async (_: string, { email, password }) => {
       const repository = getRepository(User);
-      console.log(email);
       const userData = await repository.findOne({ email });
-      console.log(userData);
-      if (userData.password == password) {
+      if (userData == undefined) {
+        throw new UserInputError('Email não cadastrado');
+      } else if (userData.password == password) {
         return userData;
+      } else if (userData.password !== password) {
+        throw new UserInputError('Senha incorreta');
       }
     },
   },

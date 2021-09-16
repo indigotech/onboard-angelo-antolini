@@ -6,6 +6,14 @@ import { LonginInput, UserInput } from './schema-types';
 import { sign, verify } from 'jsonwebtoken';
 
 export const resolvers = {
+  Login: {
+    user: (parents, args) => {
+      return parents;
+    },
+    token: () => {
+      return 'token';
+    },
+  },
   Query: {
     hello: (): string => {
       return 'hello world';

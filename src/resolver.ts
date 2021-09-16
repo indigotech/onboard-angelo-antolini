@@ -11,7 +11,7 @@ export const resolvers = {
       return parents;
     },
     token: () => {
-      return 'token';
+      return token;
     },
   },
   Query: {

@@ -16,9 +16,9 @@ export const typeDefs = gql`
     login(email: String!, password: String): outputUser!
   }
 
-  type login {
-    user(email: String!, password: String!): outputUser
-    token(validation: Boolean!): String
+  type Login {
+    user: outputUser
+    token: String
   }
 
   type outputUser {

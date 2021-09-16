@@ -6,12 +6,12 @@ export const typeDefs = gql`
   }
   type Mutation {
     createUser(name: String!, email: String!, password: String!, birthDate: String!): outputUser!
-    login(email: String!, password: String): outputUser!
+    login(email: String!, password: String!): Login
   }
 
-  type login {
-    user(email: String!, password: String!): outputUser
-    token(validation: Boolean!): String
+  type Login {
+    user: outputUser
+    token: String
   }
 
   type outputUser {

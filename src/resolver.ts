@@ -37,10 +37,11 @@ export const resolvers = {
       }
 
       if (validPassword && validEmail) {
-        const saltRounds = 10;
-        const hashPassword = await hash(originalPassword, saltRounds);
+        // const saltRounds = 10;
+        // const hashPassword = await hash(originalPassword, saltRounds);
 
-        user.password = hashPassword;
+        // user.password = hashPassword;
+        user.password = args.password;
         const response = await repository.save(user);
 
         return response;
@@ -52,6 +53,15 @@ export const resolvers = {
         );
       } else if (validPassword == false) {
         throw new CustomError('Senha inválida', 400, 'the password doesn`t have de minimum requirements');
+      }
+    },
+    login: async (_: string, { email, password }) => {
+      const repository = getRepository(User);
+      console.log(email);
+      const userData = await repository.findOne({ email });
+      console.log(userData);
+      if (userData.password == password) {
+        return userData;
       }
     },
   },

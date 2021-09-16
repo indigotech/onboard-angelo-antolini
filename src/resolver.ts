@@ -4,6 +4,9 @@ import { hash } from 'bcrypt';
 import { CustomError } from './errors';
 import { UserInput } from './schema-types';
 import { UserInputError } from 'apollo-server';
+import jwt = require('jsonwebtoken');
+
+const token = jwt.sign({ username: 'permission' }, 'supersecret', { expiresIn: 120 });
 
 export const resolvers = {
   Login: {
@@ -11,7 +14,7 @@ export const resolvers = {
       return parents;
     },
     token: () => {
-      return 'token';
+      return token;
     },
   },
   Query: {

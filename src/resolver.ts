@@ -6,14 +6,6 @@ import { LonginInput, UserInput } from './schema-types';
 import { sign, verify } from 'jsonwebtoken';
 
 export const resolvers = {
-  Login: {
-    user: (parents, args) => {
-      return parents;
-    },
-    token: () => {
-      return token;
-    },
-  },
   Query: {
     user: async (_, { id }) => {
       const repository = getRepository(User);

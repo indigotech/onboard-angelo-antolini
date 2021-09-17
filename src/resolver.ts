@@ -6,14 +6,13 @@ import { LonginInput, UserInput } from './schema-types';
 import { sign, verify } from 'jsonwebtoken';
 import jwt = require('jsonwebtoken');
 
-const token = jwt.sign({ username: 'permission' }, 'supersecret', { expiresIn: 120 });
-
 export const resolvers = {
   Login: {
     user: (parents, args) => {
       return parents;
     },
     token: () => {
+      const token = jwt.sign('verifyied', 'supersecret');
       return token;
     },
   },

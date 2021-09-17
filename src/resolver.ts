@@ -6,14 +6,13 @@ import { UserInput } from './schema-types';
 import { UserInputError } from 'apollo-server';
 import jwt = require('jsonwebtoken');
 
-const token = jwt.sign({ username: 'permission' }, 'supersecret', { expiresIn: 120 });
-
 export const resolvers = {
   Login: {
     user: (parents, args) => {
       return parents;
     },
     token: () => {
+      const token = jwt.sign('verifyied', 'supersecret');
       return token;
     },
   },
@@ -38,33 +37,34 @@ export const resolvers = {
       const sameEmail = await repository.find({ email: user.email });
       const originalPassword = args.password;
 
-      if (originalPassword.length < 7) {
-        validPassword = false;
-      } else if (originalPassword.search(/[0-9]/) == -1) {
-        validPassword = false;
-      } else if (originalPassword.search(/[a-z]/) == -1 && originalPassword.search(/[A-Z]/) == -1) {
-        validPassword = false;
-      } else if (sameEmail.length !== 0) {
-        validEmail = false;
-      }
+        if (originalPassword.length < 7) {
+          validPassword = false;
+        } else if (originalPassword.search(/[0-9]/) == -1) {
+          validPassword = false;
+        } else if (originalPassword.search(/[a-z]/) == -1 && originalPassword.search(/[A-Z]/) == -1) {
+          validPassword = false;
+        } else if (sameEmail.length !== 0) {
+          validEmail = false;
+        }
 
-      if (validPassword && validEmail) {
-        // const saltRounds = 10;
-        // const hashPassword = await hash(originalPassword, saltRounds);
+        if (validPassword && validEmail) {
+          // const saltRounds = 10;
+          // const hashPassword = await hash(originalPassword, saltRounds);
 
         // user.password = hashPassword;
         user.password = args.password;
         const response = await repository.save(user);
 
-        return response;
-      } else if (validEmail == false) {
-        throw new CustomError(
-          'Esse e-mail já está cadastrado',
-          400,
-          'you can`t have more then one user in the database with the same email',
-        );
-      } else if (validPassword == false) {
-        throw new CustomError('Senha inválida', 400, 'the password doesn`t have de minimum requirements');
+          return response;
+        } else if (validEmail == false) {
+          throw new CustomError(
+            'Esse e-mail já está cadastrado',
+            400,
+            'you can`t have more then one user in the database with the same email',
+          );
+        } else if (validPassword == false) {
+          throw new CustomError('Senha inválida', 400, 'the password doesn`t have de minimum requirements');
+        }
       }
     },
     login: async (_: string, { email, password }) => {

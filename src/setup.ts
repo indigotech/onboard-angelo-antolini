@@ -10,8 +10,8 @@ export const startServer = async () => {
     type: 'postgres',
     url: process.env.DATABASE_URL,
     entities: ['src/entity/**/*.ts'],
+    synchronize: true,
   });
-  connection.synchronize();
 
   const server = new ApolloServer({ typeDefs, resolvers });
   const { url } = await server.listen({ port: process.env.PORT });

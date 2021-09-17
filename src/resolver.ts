@@ -2,6 +2,7 @@ import { User } from './entity/User';
 import { getRepository } from 'typeorm';
 import { UserInputError } from 'apollo-server';
 import { hash } from 'bcrypt';
+import { CustomError } from './errors';
 
 export const resolvers = {
   Query: {
@@ -44,9 +45,13 @@ export const resolvers = {
 
         return response;
       } else if (validEmail == false) {
-        throw new UserInputError('Já existe um usuário com este e-mail');
+        throw new CustomError(
+          'Esse e-mail já está cadastrado',
+          400,
+          'you can`t have more then one user in the database with the same email',
+        );
       } else if (validPassword == false) {
-        throw new UserInputError('Senha inválida');
+        throw new CustomError('Senha inválida', 400, 'the password doesn`t have de minimum requirements');
       }
     },
   },

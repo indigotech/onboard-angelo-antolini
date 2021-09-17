@@ -3,7 +3,8 @@ import { startServer } from '../setup';
 import { queryRequest } from './individual-tests/query-test';
 import supertest = require('supertest');
 import { expect } from 'chai';
-import {} from '../schema';
+import { User } from '../entity/User';
+import { getRepository } from 'typeorm';
 
 before(async () => {
   dotenv.config({ path: `${__dirname}/../../test.env` });
@@ -26,10 +27,10 @@ const userCreation = (query, mutation) => {
 };
 
 describe('Database test', function () {
-  it('should send an input', async () => {
+  it('should send an input and check the response', async () => {
     const send = await userCreation(
       `mutation{
-        createUser(name: "nome", email: "userroo@email.com", password: "senhainquebravel1", birthDate: "05/12/1999"){
+        createUser(name: "test_name", email: "test_name@email.com", password: "senhainquebravel1", birthDate: "05/12/1999"){
           name
           email
           birthDate
@@ -38,19 +39,26 @@ describe('Database test', function () {
       }`,
       `query { hello }`,
     );
-    console.log(send);
     expect(send.statusCode).to.equal(200);
-    expect(send.body.data.createUser.name).to.equal('nome');
-    expect(send.body.data.createUser.email).to.equal('userroo@email.com');
+    expect(send.body.data.createUser.name).to.equal('test_name');
+    expect(send.body.data.createUser.email).to.equal('test_name@email.com');
     expect(send.body.data.createUser.birthDate).to.equal('05/12/1999');
     expect(send.body.data.createUser.id).to.exist;
   });
 
-  // it('should return the user information except the password', async () => {
-  //   const send = await userCreation(create);
-  //   expect(send.body.data.mutation.name).to.equal('nome');
-  //   expect(send.body.data.mutation.email).to.equal('userr@email.com');
-  //   expect(send.body.data.mutation.birthDate).to.equal('05/12/1999');
-  //   expect(send.body.data.mutation.id).to.exist;
-  // });
+  it('should check if the user was created in the database', async () => {
+    const repository = getRepository(User);
+    const test = await repository.findOne({ name: 'test_name' });
+    expect(test.name).to.equal('test_name');
+    expect(test.email).to.equal('test_name@email.com');
+    expect(test.birthDate).to.equal('05/12/1999');
+    expect(test.id).to.exist;
+  });
+
+  it('should erase the database and check if it was done correctly', async () => {
+    const repository = getRepository(User);
+    await repository.clear();
+    const clear = await repository.count();
+    expect(clear).to.equal(0);
+  });
 });

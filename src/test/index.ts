@@ -17,7 +17,6 @@ describe('Query test', function () {
     expect(query.body.data.hello).to.equal('hello world');
   });
 });
-/////////////////////////////////////////////////////////////////////////
 
 const userCreation = (query, mutation) => {
   return supertest(`http://localhost:${process.env.PORT}`).post('/').send({

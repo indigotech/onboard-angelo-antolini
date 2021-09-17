@@ -11,6 +11,13 @@ before(async () => {
   await startServer();
 });
 
+afterEach(async () => {
+  const repository = getRepository(User);
+  await repository.clear();
+  const clear = await repository.count();
+  expect(clear).to.equal(0);
+});
+
 describe('Query test', function () {
   it('should query Hello', async () => {
     const query = await queryRequest(`query { hello }`);

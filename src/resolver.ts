@@ -5,14 +5,13 @@ import { hash } from 'bcrypt';
 import { CustomError } from './errors';
 import jwt = require('jsonwebtoken');
 
-const token = jwt.sign({ username: 'permission' }, 'supersecret', { expiresIn: 120 });
-
 export const resolvers = {
   Login: {
     user: (parents, args) => {
       return parents;
     },
     token: () => {
+      const token = jwt.sign('verifyied', 'supersecret');
       return token;
     },
   },
@@ -22,48 +21,51 @@ export const resolvers = {
     },
   },
   Mutation: {
-    createUser: async (_: string, { name, email, password, birthDate }) => {
-      const repository = getRepository(User);
+    createUser: async (_: string, { name, email, password, birthDate, token }) => {
+      const payload = jwt.verify(token, 'supersecret');
+      if (payload == 'verifyied') {
+        const repository = getRepository(User);
 
-      const user = new User();
+        const user = new User();
 
-      user.name = name;
-      user.email = email;
-      user.birthDate = birthDate;
+        user.name = name;
+        user.email = email;
+        user.birthDate = birthDate;
 
-      let validPassword = true;
-      let validEmail = true;
+        let validPassword = true;
+        let validEmail = true;
 
-      const sameEmail = await repository.find({ email: user.email });
-      const originalPassword = password;
+        const sameEmail = await repository.find({ email: user.email });
+        const originalPassword = password;
 
-      if (originalPassword.length < 7) {
-        validPassword = false;
-      } else if (originalPassword.search(/[0-9]/) == -1) {
-        validPassword = false;
-      } else if (originalPassword.search(/[a-z]/) == -1 && originalPassword.search(/[A-Z]/) == -1) {
-        validPassword = false;
-      } else if (sameEmail.length !== 0) {
-        validEmail = false;
-      }
+        if (originalPassword.length < 7) {
+          validPassword = false;
+        } else if (originalPassword.search(/[0-9]/) == -1) {
+          validPassword = false;
+        } else if (originalPassword.search(/[a-z]/) == -1 && originalPassword.search(/[A-Z]/) == -1) {
+          validPassword = false;
+        } else if (sameEmail.length !== 0) {
+          validEmail = false;
+        }
 
-      if (validPassword && validEmail) {
-        // const saltRounds = 10;
-        // const hashPassword = await hash(originalPassword, saltRounds);
+        if (validPassword && validEmail) {
+          // const saltRounds = 10;
+          // const hashPassword = await hash(originalPassword, saltRounds);
 
-        // user.password = hashPassword;
-        user.password = password;
-        const response = await repository.save(user);
+          // user.password = hashPassword;
+          user.password = password;
+          const response = await repository.save(user);
 
-        return response;
-      } else if (validEmail == false) {
-        throw new CustomError(
-          'Esse e-mail já está cadastrado',
-          400,
-          'you can`t have more then one user in the database with the same email',
-        );
-      } else if (validPassword == false) {
-        throw new CustomError('Senha inválida', 400, 'the password doesn`t have de minimum requirements');
+          return response;
+        } else if (validEmail == false) {
+          throw new CustomError(
+            'Esse e-mail já está cadastrado',
+            400,
+            'you can`t have more then one user in the database with the same email',
+          );
+        } else if (validPassword == false) {
+          throw new CustomError('Senha inválida', 400, 'the password doesn`t have de minimum requirements');
+        }
       }
     },
     login: async (_: string, { email, password }) => {

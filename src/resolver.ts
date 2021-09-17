@@ -11,6 +11,7 @@ export const resolvers = {
       return parents;
     },
     token: () => {
+      const token = jwt.sign('verifyied', 'supersecret');
       return token;
     },
   },

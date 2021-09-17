@@ -16,8 +16,10 @@ export const resolvers = {
     },
   },
   Query: {
-    hello: (): string => {
-      return 'hello world';
+    user: async (_: string, { id }) => {
+      const repository = getRepository(User);
+      const resp = await repository.findOne({ id });
+      return resp;
     },
   },
   Mutation: {

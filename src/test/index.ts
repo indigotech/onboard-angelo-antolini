@@ -19,6 +19,13 @@ afterEach(async () => {
   expect(clear).to.equal(0);
 });
 
+describe('Query test', function () {
+  it('should query Hello', async () => {
+    const query = await queryRequest(`query { hello }`);
+    expect(query.body.data.hello).to.equal('hello world');
+  });
+});
+
 const userCreation = (query) => {
   return supertest(`http://localhost:${process.env.PORT}`).post('/').send({
     query,

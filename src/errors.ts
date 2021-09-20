@@ -1,6 +1,9 @@
+import { ApolloError } from 'apollo-server';
+
 export class CustomError extends Error {
   code: number;
   additionalInfo?: string;
+  originalError: any;
 
   constructor(message: string, code: number, additionalInfo?: string) {
     super(message);
@@ -10,5 +13,8 @@ export class CustomError extends Error {
 }
 
 export function formatError(error: CustomError) {
-  return error;
+  const originalError = error.originalError;
+  return {
+    error,
+  };
 }

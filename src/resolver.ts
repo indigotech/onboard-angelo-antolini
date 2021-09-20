@@ -3,6 +3,7 @@ import { getRepository } from 'typeorm';
 import { UserInputError } from 'apollo-server';
 import { hash } from 'bcrypt';
 import { CustomError } from './errors';
+import { formatError } from './errors';
 
 export const resolvers = {
   Query: {

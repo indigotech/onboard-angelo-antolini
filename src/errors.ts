@@ -1,9 +1,8 @@
-import { ApolloError } from 'apollo-server';
+import { GraphQLError } from 'graphql';
 
 export class CustomError extends Error {
   code: number;
   additionalInfo?: string;
-  originalError: any;
 
   constructor(message: string, code: number, additionalInfo?: string) {
     super(message);
@@ -12,9 +11,13 @@ export class CustomError extends Error {
   }
 }
 
-export function formatError(error: CustomError) {
-  const originalError = error.originalError;
-  return {
-    error,
+export function formatError(error: GraphQLError) {
+  const originalError = error.originalError as CustomError;
+  const newError = {
+    ...error,
+    message: originalError.message,
+    code: originalError.code,
+    additionalInfo: originalError.additionalInfo,
   };
+  return newError;
 }

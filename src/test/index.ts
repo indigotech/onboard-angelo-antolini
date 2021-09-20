@@ -82,9 +82,10 @@ describe('Error test', function () {
         }
       }`,
     );
+
     const passwordError = shortPassword.body.errors[0];
     expect(passwordError.message).to.equal('Senha inválida');
-    expect(passwordError.extensions.exception.code).to.equal(400);
+    expect(passwordError.code).to.equal(400);
 
     const noNumberPassword = await userCreation(
       `mutation{
@@ -98,7 +99,7 @@ describe('Error test', function () {
     );
     const passwordError2 = noNumberPassword.body.errors[0];
     expect(passwordError2.message).to.equal('Senha inválida');
-    expect(passwordError2.extensions.exception.code).to.equal(400);
+    expect(passwordError2.code).to.equal(400);
 
     const noLetterPassword = await userCreation(
       `mutation{
@@ -112,7 +113,7 @@ describe('Error test', function () {
     );
     const passwordError3 = noLetterPassword.body.errors[0];
     expect(passwordError3.message).to.equal('Senha inválida');
-    expect(passwordError3.extensions.exception.code).to.equal(400);
+    expect(passwordError3.code).to.equal(400);
   });
   it('should return an email error ', async () => {
     const repository = getRepository(User);
@@ -133,9 +134,8 @@ describe('Error test', function () {
         }
       }`,
     );
-    console.log(secondUser);
-    // const emailError = secondUser.body.errors[0];
-    // expect(emailError.message).to.equal('Esse e-mail já está cadastrado');
-    // expect(emailError.extensions.exception.code).to.equal(400);
+    const emailError = secondUser.body.errors[0];
+    expect(emailError.message).to.equal('Esse e-mail já está cadastrado');
+    expect(emailError.code).to.equal(400);
   });
 });

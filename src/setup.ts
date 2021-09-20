@@ -14,7 +14,7 @@ export const startServer = async () => {
     synchronize: true,
   });
 
-  const server = new ApolloServer({ typeDefs, resolvers });
-  const { url } = await server.listen({ port: process.env.PORT }, formatError);
+  const server = new ApolloServer({ typeDefs, resolvers, formatError });
+  const { url } = await server.listen({ port: process.env.PORT });
   console.log(`Server running on: ${url}`);
 };

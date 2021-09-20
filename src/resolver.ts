@@ -48,7 +48,7 @@ export const resolvers = {
         }
 
         if (validPassword && validEmail) {
-          // const saltRounds = 10;
+          // const saltRounds = 0;
           // const hashPassword = await hash(originalPassword, saltRounds);
 
         // user.password = hashPassword;
@@ -65,6 +65,8 @@ export const resolvers = {
         } else if (validPassword == false) {
           throw new CustomError('Senha inválida', 400, 'the password doesn`t have de minimum requirements');
         }
+      } else {
+        throw new CustomError('Seu login expirou, faça novamente', 401, 'invalid or inexisting token');
       }
     },
     login: async (_: string, { email, password }) => {

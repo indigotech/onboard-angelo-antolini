@@ -6,15 +6,6 @@ import { LonginInput, UserInput } from './schema-types';
 import { sign, verify } from 'jsonwebtoken';
 
 export const resolvers = {
-  Login: {
-    user: (parents, args) => {
-      return parents;
-    },
-    token: () => {
-      const token = jwt.sign('verifyied', 'supersecret');
-      return token;
-    },
-  },
   Query: {
     user: async (_, { id }) => {
       const repository = getRepository(User);
@@ -104,17 +95,6 @@ export const resolvers = {
 
       const token = sign(`${userData.id}`, 'supersecret');
       return { user: userData, token: token };
-    },
-    login: async (_: string, { email, password }) => {
-      const repository = getRepository(User);
-      const userData = await repository.findOne({ email });
-      if (userData == undefined) {
-        throw new UserInputError('Email não cadastrado');
-      } else if (compare(password, userData.password)) {
-        return userData;
-      } else {
-        throw new UserInputError('Senha incorreta');
-      }
     },
   },
 };

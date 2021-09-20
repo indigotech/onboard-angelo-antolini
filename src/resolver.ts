@@ -110,9 +110,9 @@ export const resolvers = {
       const userData = await repository.findOne({ email });
       if (userData == undefined) {
         throw new UserInputError('Email não cadastrado');
-      } else if (userData.password == password) {
+      } else if (compare(password, userData.password)) {
         return userData;
-      } else if (userData.password !== password) {
+      } else {
         throw new UserInputError('Senha incorreta');
       }
     },

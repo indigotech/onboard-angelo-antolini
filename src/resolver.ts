@@ -21,9 +21,9 @@ export const resolvers = {
       const resp = await repository.findOne({ id });
       return resp;
     },
-    users: async (_: string, quantity: any) => {
+    users: async (_: string, quantity?: number) => {
       const repository = getRepository(User);
-      const list = await repository.find({ id: quantity });
+      const list = await repository.createQueryBuilder().orderBy('name').limit(10).getMany();
       return list;
     },
   },

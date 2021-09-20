@@ -61,7 +61,7 @@ describe('User creation test', function () {
     expect(user.name).to.equal('test_name');
     expect(user.email).to.equal('test_name@email.com');
     expect(user.birthDate).to.equal('05/12/1999');
-    expect(user.id).to.exist;
+    expect(user.id).to.greaterThan(0);
 
     const repository = getRepository(User);
     const test = await repository.findOne({ id: user.id });
@@ -69,7 +69,7 @@ describe('User creation test', function () {
     expect(test.name).to.equal('test_name');
     expect(test.email).to.equal('test_name@email.com');
     expect(test.birthDate).to.equal('05/12/1999');
-    expect(test.id).to.exist;
+    expect(test.id).to.greaterThan(0);
   });
 });
 
@@ -134,5 +134,37 @@ describe('email error test', function () {
     const emailError = secondUser.body.errors[0];
     expect(emailError.message).to.equal('Esse e-mail já está cadastrado');
     expect(emailError.code).to.equal(400);
+  });
+});
+describe('Login test', function () {
+  it('Should check the login setup', async () => {
+    const repository = getRepository(User);
+    const user = new User();
+    user.name = 'test_name';
+    user.email = 'test_name@email.com';
+    user.password = 'senhaok1';
+    user.birthDate = '05/12/1999';
+    await repository.save(user);
+    const loginResponse = await userCreation(`
+      mutation{
+        login(email: "test_name@email.com", password: "senhaok1") {
+          user {
+          name
+          email
+          birthDate
+          id
+          } 
+          token
+        }
+      }
+    `);
+
+    const login = loginResponse.body.data.login;
+
+    expect(login.user.name).to.equal('test_name');
+    expect(login.user.email).to.equal('test_name@email.com');
+    expect(login.user.birthDate).to.equal('05/12/1999');
+    expect(login.user.id).to.greaterThan(0);
+    expect(login.token).to.equal('eyJhbGciOiJIUzI1NiJ9.dmVyaWZ5aWVk.JmT4Z2ZWJmtxlnaApsxlOB463KagGESrvLV59tonjfY');
   });
 });

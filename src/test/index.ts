@@ -19,13 +19,6 @@ afterEach(async () => {
   expect(clear).to.equal(0);
 });
 
-describe('Query test', function () {
-  it('should query Hello', async () => {
-    const query = await queryRequest(`query { hello }`);
-    expect(query.body.data.hello).to.equal('hello world');
-  });
-});
-
 const userCreation = (query) => {
   return supertest(`http://localhost:${process.env.PORT}`).post('/').send({
     query,
@@ -61,6 +54,30 @@ describe('Database test', function () {
     expect(test.email).to.equal('test_name@email.com');
     expect(test.birthDate).to.equal('05/12/1999');
     expect(test.id).to.greaterThan(0);
+  });
+});
+
+describe('Query test', function () {
+  it('should query user by id', async () => {
+    const repository = getRepository(User);
+    const user = new User();
+    user.name = 'test_name';
+    user.email = 'test_name@email.com';
+    user.password = 'senhaok1';
+    user.birthDate = '05/12/1999';
+    await repository.save(user);
+    const findUser = await userCreation(`
+    query{
+      user(id:2){
+        name
+        email
+        birthDate
+      }
+    }`);
+    const queryiedUser = findUser.body.data.user;
+    expect(queryiedUser.name).to.equal('test_name');
+    expect(queryiedUser.email).to.equal('test_name@email.com');
+    expect(queryiedUser.birthDate).to.equal('05/12/1999');
   });
 });
 

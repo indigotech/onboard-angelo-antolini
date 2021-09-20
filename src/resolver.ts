@@ -21,6 +21,11 @@ export const resolvers = {
       const resp = await repository.findOne({ id });
       return resp;
     },
+    users: async (_: string, quantity: any) => {
+      const repository = getRepository(User);
+      const list = await repository.find({ id: quantity });
+      return list;
+    },
   },
   Mutation: {
     createUser: async (_: string, { name, email, password, birthDate, token }) => {

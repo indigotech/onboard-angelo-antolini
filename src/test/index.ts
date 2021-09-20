@@ -42,7 +42,7 @@ describe('Database test', function () {
   it('should send an input, check the response and check if the user was creatred in the database', async () => {
     const send = await userCreation(
       `mutation{
-        createUser(name: "test_name", email: "test_name@email.com", password: "senhainquebravel1", birthDate: "05/12/1999"){
+        createUser(name: "test_name", email: "test_name@email.com", password: "senhainquebravel1", birthDate: "05/12/1999", token: "eyJhbGciOiJIUzI1NiJ9.dmVyaWZ5aWVk.JmT4Z2ZWJmtxlnaApsxlOB463KagGESrvLV59tonjfY"){
           name
           email
           birthDate
@@ -74,7 +74,7 @@ describe('Error test', function () {
   it('should return a password error', async () => {
     const shortPassword = await userCreation(
       `mutation{
-        createUser(name: "test_name", email: "test_name@email.com", password: "senha1", birthDate: "05/12/1999"){
+        createUser(name: "test_name", email: "test_name@email.com", password: "senha1", birthDate: "05/12/1999", token: "eyJhbGciOiJIUzI1NiJ9.dmVyaWZ5aWVk.JmT4Z2ZWJmtxlnaApsxlOB463KagGESrvLV59tonjfY"){
           name
           email
           birthDate
@@ -89,7 +89,7 @@ describe('Error test', function () {
 
     const noNumberPassword = await userCreation(
       `mutation{
-        createUser(name: "test_name", email: "test_name@email.com", password: "senhasenha", birthDate: "05/12/1999"){
+        createUser(name: "test_name", email: "test_name@email.com", password: "senhasenha", birthDate: "05/12/1999", token: "eyJhbGciOiJIUzI1NiJ9.dmVyaWZ5aWVk.JmT4Z2ZWJmtxlnaApsxlOB463KagGESrvLV59tonjfY"){
           name
           email
           birthDate
@@ -103,7 +103,7 @@ describe('Error test', function () {
 
     const noLetterPassword = await userCreation(
       `mutation{
-        createUser(name: "test_name", email: "test_name@email.com", password: "123456789", birthDate: "05/12/1999"){
+        createUser(name: "test_name", email: "test_name@email.com", password: "123456789", birthDate: "05/12/1999", token: "eyJhbGciOiJIUzI1NiJ9.dmVyaWZ5aWVk.JmT4Z2ZWJmtxlnaApsxlOB463KagGESrvLV59tonjfY"){
           name
           email
           birthDate
@@ -126,7 +126,7 @@ describe('Error test', function () {
 
     const secondUser = await userCreation(
       `mutation{
-        createUser(name: "test_name2", email: "test_name@email.com", password: "senhaok2", birthDate: "06/12/1999"){
+        createUser(name: "test_name2", email: "test_name@email.com", password: "senhaok2", birthDate: "06/12/1999", token: "eyJhbGciOiJIUzI1NiJ9.dmVyaWZ5aWVk.JmT4Z2ZWJmtxlnaApsxlOB463KagGESrvLV59tonjfY"){
           name
           email
           birthDate

@@ -1,7 +1,7 @@
 import { User } from './entity/User';
 import { getRepository } from 'typeorm';
 import { UserInputError } from 'apollo-server';
-import { hash } from 'bcrypt';
+import { compare, hash } from 'bcrypt';
 import { CustomError } from './errors';
 import jwt = require('jsonwebtoken');
 
@@ -49,11 +49,10 @@ export const resolvers = {
         }
 
         if (validPassword && validEmail) {
-          // const saltRounds = 0;
-          // const hashPassword = await hash(originalPassword, saltRounds);
+          const saltRounds = 0;
+          const hashPassword = await hash(originalPassword, saltRounds);
 
-          // user.password = hashPassword;
-          user.password = password;
+          user.password = hashPassword;
           const response = await repository.save(user);
 
           return response;
@@ -75,9 +74,9 @@ export const resolvers = {
       const userData = await repository.findOne({ email });
       if (userData == undefined) {
         throw new UserInputError('Email não cadastrado');
-      } else if (userData.password == password) {
+      } else if (compare(password, userData.password)) {
         return userData;
-      } else if (userData.password !== password) {
+      } else {
         throw new UserInputError('Senha incorreta');
       }
     },

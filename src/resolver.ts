@@ -20,6 +20,12 @@ export const resolvers = {
     hello: (): string => {
       return 'hello world';
     },
+
+    users: async (_: string, quantity: any) => {
+      const repository = getRepository(User);
+      const list = await repository.find({ id: quantity });
+      return list;
+    },
   },
   Mutation: {
     createUser: async (_, { data: args }: { data: UserInput }, context) => {

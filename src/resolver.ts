@@ -71,11 +71,14 @@ export const resolvers = {
       const repository = getRepository(User);
       const userData = await repository.findOne({ email });
       if (userData == undefined) {
-        throw new UserInputError('Email não cadastrado');
-      } else if (compare(password, userData.password)) {
-        return userData;
+        throw new CustomError('Email não cadastrado', 400);
       } else {
-        throw new UserInputError('Senha incorreta');
+        const match = await compare(password, userData.password);
+        if (match) {
+          return userData;
+        } else {
+          throw new CustomError('Senha incorreta', 400);
+        }
       }
     },
   },

@@ -6,6 +6,7 @@ import { expect } from 'chai';
 import { User } from '../entity/User';
 import { getRepository } from 'typeorm';
 import { UserInput } from '../schema-types';
+import { hash } from 'bcrypt';
 
 before(async () => {
   dotenv.config({ path: `${__dirname}/../../test.env` });
@@ -73,7 +74,11 @@ describe('User creation test', function () {
   });
 });
 
+<<<<<<< HEAD
 describe('password error test', function () {
+=======
+describe('input error test', function () {
+>>>>>>> c580037... implementacao dos testes
   it('should return a password error', async () => {
     let data = {
       name: 'test_name',
@@ -142,9 +147,10 @@ describe('Login test', function () {
     const user = new User();
     user.name = 'test_name';
     user.email = 'test_name@email.com';
-    user.password = 'senhaok1';
+    user.password = await hash('senhaok1', 0);
     user.birthDate = '05/12/1999';
     await repository.save(user);
+
     const loginResponse = await userCreation(`
       mutation{
         login(email: "test_name@email.com", password: "senhaok1") {
@@ -167,4 +173,48 @@ describe('Login test', function () {
     expect(login.user.id).to.greaterThan(0);
     expect(login.token).to.equal('eyJhbGciOiJIUzI1NiJ9.dmVyaWZ5aWVk.JmT4Z2ZWJmtxlnaApsxlOB463KagGESrvLV59tonjfY');
   });
+  it('should return a login error', async () => {
+    const repository = getRepository(User);
+    const user = new User();
+    user.name = 'test_name';
+    user.email = 'test_name@email.com';
+    user.password = await hash('senhaok1', 0);
+    user.birthDate = '05/12/1999';
+    await repository.save(user);
+
+    const inexistingEmail = await userCreation(`
+      mutation{
+        login(email: "wrong_test_name@email.com", password: "senhaok1") {
+          user {
+          name
+          email
+          birthDate
+          id
+          } 
+          token
+        }
+      }
+    `);
+
+    const emailError = inexistingEmail.body.errors[0];
+    expect(emailError.message).to.equal('Email não cadastrado');
+    expect(emailError.code).to.equal(400);
+
+    const wrongPassword = await userCreation(`
+      mutation{
+        login(email: "test_name@email.com", password: "senhanotok1") {
+          user {
+          name
+          email
+          birthDate
+          id
+          } 
+          token
+        }
+      }
+    `);
+    const passwordError = wrongPassword.body.errors[0];
+    expect(passwordError.message).to.equal('Senha incorreta');
+    expect(passwordError.code).to.equal(400);
+    });
 });

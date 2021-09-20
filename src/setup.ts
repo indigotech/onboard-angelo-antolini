@@ -6,10 +6,11 @@ import { typeDefs } from './schema';
 import { resolvers } from './resolver';
 
 export const startServer = async () => {
-  await createConnection({
+  const connection = await createConnection({
     type: 'postgres',
     url: process.env.DATABASE_URL,
     entities: ['src/entity/**/*.ts'],
+    synchronize: true,
   });
 
   const server = new ApolloServer({ typeDefs, resolvers });

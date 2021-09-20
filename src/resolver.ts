@@ -7,7 +7,7 @@ import jwt = require('jsonwebtoken');
 
 export const resolvers = {
   Login: {
-    user: (parents, args) => {
+    user: (parents) => {
       return parents;
     },
     token: () => {

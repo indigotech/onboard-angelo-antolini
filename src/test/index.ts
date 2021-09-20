@@ -18,9 +18,8 @@ describe('Query test', function () {
   });
 });
 
-const userCreation = (query, mutation) => {
+const userCreation = (query) => {
   return supertest(`http://localhost:${process.env.PORT}`).post('/').send({
-    mutation,
     query,
   });
 };
@@ -43,7 +42,6 @@ describe('Database test', function () {
           id
         }
       }`,
-      `query { hello }`,
     );
 
     expect(send.statusCode).to.equal(200);
@@ -53,14 +51,14 @@ describe('Database test', function () {
     expect(user.name).to.equal('test_name');
     expect(user.email).to.equal('test_name@email.com');
     expect(user.birthDate).to.equal('05/12/1999');
-    expect(user.id).to.exist;
+    expect(user.id).to.greaterThan(0);
 
     const repository = getRepository(User);
-    const test = await repository.findOne({ name: 'test_name' });
+    const test = await repository.findOne({ id: user.id });
 
     expect(test.name).to.equal('test_name');
     expect(test.email).to.equal('test_name@email.com');
     expect(test.birthDate).to.equal('05/12/1999');
-    expect(test.id).to.exist;
+    expect(test.id).to.greaterThan(0);
   });
 });

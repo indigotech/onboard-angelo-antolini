@@ -66,9 +66,10 @@ describe('Query test', function () {
     user.password = 'senhaok1';
     user.birthDate = '05/12/1999';
     await repository.save(user);
+    const idQuery = await (await repository.findOne({ name: 'test_name' })).id;
     const findUser = await userCreation(`
     query{
-      user(id:2){
+      user(id:${idQuery}){
         name
         email
         birthDate
@@ -150,6 +151,7 @@ describe('input error test', function () {
     expect(emailError.code).to.equal(400);
   });
 });
+
 describe('Login test', function () {
   it('Should check the login setup', async () => {
     const repository = getRepository(User);
@@ -225,37 +227,5 @@ describe('Login test', function () {
     const passwordError = wrongPassword.body.errors[0];
     expect(passwordError.message).to.equal('Senha incorreta');
     expect(passwordError.code).to.equal(400);
-  });
-});
-describe('Login test', function () {
-  it('Should check the login setup', async () => {
-    const repository = getRepository(User);
-    const user = new User();
-    user.name = 'test_name';
-    user.email = 'test_name@email.com';
-    user.password = 'senhaok1';
-    user.birthDate = '05/12/1999';
-    await repository.save(user);
-    const loginResponse = await userCreation(`
-      mutation{
-        login(email: "test_name@email.com", password: "senhaok1") {
-          user {
-          name
-          email
-          birthDate
-          id
-          } 
-          token
-        }
-      }
-    `);
-
-    const login = loginResponse.body.data.login;
-
-    expect(login.user.name).to.equal('test_name');
-    expect(login.user.email).to.equal('test_name@email.com');
-    expect(login.user.birthDate).to.equal('05/12/1999');
-    expect(login.user.id).to.greaterThan(0);
-    expect(login.token).to.equal('eyJhbGciOiJIUzI1NiJ9.dmVyaWZ5aWVk.JmT4Z2ZWJmtxlnaApsxlOB463KagGESrvLV59tonjfY');
   });
 });

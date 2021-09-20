@@ -1,5 +1,5 @@
 import { User } from './entity/User';
-import { getRepository } from 'typeorm';
+import { getRepository, Repository } from 'typeorm';
 import { UserInputError } from 'apollo-server';
 import { compare, hash } from 'bcrypt';
 import { CustomError } from './errors';
@@ -15,16 +15,50 @@ export const resolvers = {
       return token;
     },
   },
+
+  Pagination: {
+    list: ({ list }) => {
+      return list;
+    },
+    pageBefore: ({ pageBefore }) => {
+      return pageBefore;
+    },
+    pageAfter: ({ pageAfter }) => {
+      return pageAfter;
+    },
+    shown: ({ shown }) => {
+      return shown;
+    },
+  },
   Query: {
     user: async (_: string, { id }) => {
       const repository = getRepository(User);
       const resp = await repository.findOne({ id });
       return resp;
     },
-    users: async (_: string, quantity?: number) => {
+    users: async (_: string, { quantity, page }) => {
+      let pageBefore = false;
+      let pageAfter = false;
+      let shown = '';
       const repository = getRepository(User);
-      const list = await repository.createQueryBuilder().orderBy('name').limit(10).getMany();
-      return list;
+      quantity == undefined ? (quantity = 10) : quantity;
+      page == undefined ? (page = 0) : (page += -1);
+      const skip = page * quantity;
+      const list = await repository.createQueryBuilder().orderBy('name').limit(quantity).offset(skip).getMany();
+      if (page > 0) {
+        pageBefore = true;
+      }
+      if ((await repository.findOne({ id: skip + quantity + 1 })) != undefined) {
+        pageAfter = true;
+      }
+      const totalUsers = await repository.count();
+      if (totalUsers > skip + quantity) {
+        shown = `users:${skip + 1}-${skip + quantity}/${totalUsers}`;
+      } else {
+        shown = `users:${skip + 1}-${totalUsers}/${totalUsers}`;
+      }
+
+      return { list, pageBefore, pageAfter, shown };
     },
   },
   Mutation: {

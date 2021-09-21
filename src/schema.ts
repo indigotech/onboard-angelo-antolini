@@ -14,4 +14,11 @@ export const typeDefs = gql`
     birthDate: String!
     id: Int!
   }
+
+  type UserInput {
+    name: String
+    email: String
+    password: String
+    birthDate: String
+  }
 `;

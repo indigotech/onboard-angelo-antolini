@@ -31,6 +31,15 @@ const userCreation = (query) => {
   });
 };
 
+const mutation = `mutation($data:String) {
+  createUser(data:$data){
+    name
+    email
+    birthDate
+    id
+  }
+}`;
+
 describe('Database test', function () {
   afterEach(async () => {
     const repository = getRepository(User);
@@ -40,16 +49,9 @@ describe('Database test', function () {
   });
 
   it('should send an input, check the response and check if the user was creatred in the database', async () => {
-    const send = await userCreation(
-      `mutation{
-        createUser(name: "test_name", email: "test_name@email.com", password: "senhainquebravel1", birthDate: "05/12/1999"){
-          name
-          email
-          birthDate
-          id
-        }
-      }`,
-    );
+    const $data = 'name: "test_name", email: "test_name@email.com", password: "senha1", birthDate: "05/12/1999"';
+    const send = await userCreation(mutation);
+    console.log(send);
 
     expect(send.statusCode).to.equal(200);
 

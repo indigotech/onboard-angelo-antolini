@@ -5,30 +5,16 @@ export const typeDefs = gql`
     hello: String!
   }
   type Mutation {
-<<<<<<< HEAD
-<<<<<<< HEAD
-    createUser(data: UserInput): outputUser!
-=======
-    createUser(name: String!, email: String!, password: String!, birthDate: String!): outputUser!
-=======
-    createUser(name: String!, email: String!, password: String!, birthDate: String!, token: String!): outputUser!
->>>>>>> 1c9fbf1... userCreation com token
-    login(email: String!, password: String!): Login
+    createUser(data: UserInput!): User!
+    login(data: LoginInput!): Login!
   }
 
-<<<<<<< HEAD
-  type login {
-    user(email: String!, password: String!): outputUser
-    token(validation: Boolean!): String
->>>>>>> c4a35ea... inicio do login
-=======
   type Login {
-    user: outputUser
+    user: User
     token: String
->>>>>>> 0d473c0... integration with database
   }
 
-  type outputUser {
+  type User {
     name: String!
     email: String!
     birthDate: String!
@@ -40,5 +26,10 @@ export const typeDefs = gql`
     email: String
     password: String
     birthDate: String
+  }
+
+  input LoginInput {
+    email: String
+    password: String
   }
 `;

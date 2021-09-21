@@ -5,7 +5,7 @@ import supertest = require('supertest');
 import { expect } from 'chai';
 import { User } from '../entity/User';
 import { getRepository } from 'typeorm';
-import { UserInput } from '../schema-types';
+import { UserInput, LonginInput } from '../schema-types';
 import { hash } from 'bcrypt';
 
 before(async () => {
@@ -34,18 +34,31 @@ const userCreation = (query, variables) => {
   });
 };
 
-const mutation = `
-    mutation CreateUser($data: UserInput!) {
-      createUser(data: $data) {
-        id
-        name
-        email
-        birthDate
-      }
+const createMutation = `
+  mutation CreateUser($data: UserInput!) {
+    createUser(data: $data) {
+      id
+      name
+      email
+      birthDate
     }
-  `;
+  }
+`;
 
-describe('User creation test', function () {
+const loginMutation = `
+  mutation ($data : LoginInput!){
+    login(data: $data) {
+      user {
+      name
+      email
+      birthDate
+      id
+      } 
+      token
+    }
+  }
+`;
+describe('Database test', function () {
   it('should send an input, check the response and check if the user was creatred in the database', async () => {
     const data: UserInput = {
       name: 'test_name',
@@ -53,7 +66,7 @@ describe('User creation test', function () {
       password: 'senhaok1',
       birthDate: '05/12/1999',
     };
-    const send = await userCreation(mutation, { data });
+    const send = await userCreation(createMutation, { data });
 
     expect(send.statusCode).to.equal(200);
 
@@ -83,7 +96,7 @@ describe('password error test', function () {
       birthDate: '05/12/1999',
     };
 
-    const shortPassword = await userCreation(mutation, { data });
+    const shortPassword = await userCreation(createMutation, { data });
     const passwordError = shortPassword.body.errors[0];
     expect(passwordError.message).to.equal('Senha inválida');
     expect(passwordError.code).to.equal(400);
@@ -95,7 +108,7 @@ describe('password error test', function () {
       birthDate: '05/12/1999',
     };
 
-    const noNumberPassword = await userCreation(mutation, { data });
+    const noNumberPassword = await userCreation(createMutation, { data });
     const passwordError2 = noNumberPassword.body.errors[0];
     expect(passwordError2.message).to.equal('Senha inválida');
     expect(passwordError2.code).to.equal(400);
@@ -107,7 +120,7 @@ describe('password error test', function () {
       birthDate: '05/12/1999',
     };
 
-    const noLetterPassword = await userCreation(mutation, { data });
+    const noLetterPassword = await userCreation(createMutation, { data });
 
     const passwordError3 = noLetterPassword.body.errors[0];
     expect(passwordError3.message).to.equal('Senha inválida');
@@ -131,12 +144,13 @@ describe('email error test', function () {
       birthDate: '06/12/1999',
     };
 
-    const secondUser = await userCreation(mutation, { data });
+    const secondUser = await userCreation(createMutation, { data });
     const emailError = secondUser.body.errors[0];
     expect(emailError.message).to.equal('Esse e-mail já está cadastrado');
     expect(emailError.code).to.equal(400);
   });
 });
+
 describe('Login test', function () {
   it('Should make the login and check the return and the token', async () => {
     const repository = getRepository(User);
@@ -147,19 +161,11 @@ describe('Login test', function () {
     user.birthDate = '05/12/1999';
     await repository.save(user);
 
-    const loginResponse = await userCreation(`
-      mutation{
-        login(email: "test_name@email.com", password: "senhaok1") {
-          user {
-          name
-          email
-          birthDate
-          id
-          } 
-          token
-        }
-      }
-    `);
+    const data: LonginInput = {
+      email: user.email,
+      password: 'senhaok1',
+    };
+    const loginResponse = await userCreation(loginMutation, { data });
 
     const login = loginResponse.body.data.login;
 
@@ -170,7 +176,7 @@ describe('Login test', function () {
     expect(login.token).to.equal('eyJhbGciOiJIUzI1NiJ9.dmVyaWZ5aWVk.JmT4Z2ZWJmtxlnaApsxlOB463KagGESrvLV59tonjfY');
   });
 
-  it('should return a login error', async () => {
+  it('should return an email login error', async () => {
     const repository = getRepository(User);
     const user = new User();
     user.name = 'test_name';
@@ -179,37 +185,31 @@ describe('Login test', function () {
     user.birthDate = '05/12/1999';
     await repository.save(user);
 
-    const inexistingEmail = await userCreation(`
-      mutation{
-        login(email: "wrong_test_name@email.com", password: "senhaok1") {
-          user {
-          name
-          email
-          birthDate
-          id
-          } 
-          token
-        }
-      }
-    `);
+    const data: LonginInput = {
+      email: 'wrong_test_name@email.com',
+      password: 'senhaok1',
+    };
+    const inexistingEmail = await userCreation(loginMutation, { data });
 
     const emailError = inexistingEmail.body.errors[0];
     expect(emailError.message).to.equal('Email não cadastrado');
     expect(emailError.code).to.equal(404);
+  });
 
-    const wrongPassword = await userCreation(`
-      mutation{
-        login(email: "test_name@email.com", password: "senhanotok1") {
-          user {
-          name
-          email
-          birthDate
-          id
-          } 
-          token
-        }
-      }
-    `);
+  it('should return a password login error', async () => {
+    const repository = getRepository(User);
+    const user = new User();
+    user.name = 'test_name';
+    user.email = 'test_name@email.com';
+    user.password = await hash('senhaok1', 0);
+    user.birthDate = '05/12/1999';
+    await repository.save(user);
+
+    const data: LonginInput = {
+      email: user.email,
+      password: 'senhanotok1',
+    };
+    const wrongPassword = await userCreation(loginMutation, { data });
     const passwordError = wrongPassword.body.errors[0];
     expect(passwordError.message).to.equal('Senha incorreta');
     expect(passwordError.code).to.equal(401);

@@ -17,9 +17,13 @@ export const resolvers = {
     },
   },
   Query: {
-    user: async (_: string, { id }) => {
+    user: async (_, { id }) => {
       const repository = getRepository(User);
       const resp = await repository.findOne({ id });
+
+      if (!resp) {
+        throw new CustomError('Usuário não encontrado', 404);
+      }
       return resp;
     },
   },

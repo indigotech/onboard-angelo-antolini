@@ -1,6 +1,5 @@
 import { User } from './entity/User';
 import { getRepository, Repository } from 'typeorm';
-import { UserInputError } from 'apollo-server';
 import { compare, hash } from 'bcrypt';
 import { CustomError } from './errors';
 import jwt = require('jsonwebtoken');
@@ -30,6 +29,7 @@ export const resolvers = {
       return shown;
     },
   },
+
   Query: {
     user: async (_: string, { id }) => {
       const repository = getRepository(User);
@@ -40,22 +40,33 @@ export const resolvers = {
       let pageBefore = false;
       let pageAfter = false;
       let shown = '';
+      let list = [];
+
       const repository = getRepository(User);
+
       quantity == undefined ? (quantity = 10) : quantity;
       page == undefined ? (page = 0) : (page += -1);
       const skip = page * quantity;
-      const list = await repository.createQueryBuilder().orderBy('name').limit(quantity).offset(skip).getMany();
-      if (page > 0) {
-        pageBefore = true;
-      }
-      if ((await repository.findOne({ id: skip + quantity + 1 })) != undefined) {
-        pageAfter = true;
-      }
+
       const totalUsers = await repository.count();
-      if (totalUsers > skip + quantity) {
-        shown = `users:${skip + 1}-${skip + quantity}/${totalUsers}`;
+
+      if (page < 0 || skip > totalUsers) {
+        throw new CustomError('Esta página nao existe', 404);
+      } else if (quantity == 0) {
+        throw new CustomError('Insira uma quantidade não nula de usuários por pagina', 400);
       } else {
-        shown = `users:${skip + 1}-${totalUsers}/${totalUsers}`;
+        list = await repository.createQueryBuilder().orderBy('name').limit(quantity).offset(skip).getMany();
+        if (page > 0) {
+          pageBefore = true;
+        }
+        if ((await repository.findOne({ id: skip + quantity + 1 })) != undefined) {
+          pageAfter = true;
+        }
+        if (totalUsers > skip + quantity) {
+          shown = `users:${skip + 1}-${skip + quantity}/${totalUsers}`;
+        } else {
+          shown = `users:${skip + 1}-${totalUsers}/${totalUsers}`;
+        }
       }
 
       return { list, pageBefore, pageAfter, shown };

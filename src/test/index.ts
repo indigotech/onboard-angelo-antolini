@@ -6,6 +6,7 @@ import { expect } from 'chai';
 import { User } from '../entity/User';
 import { getRepository } from 'typeorm';
 import { hash } from 'bcrypt';
+import { savingUser } from '../faker/index';
 
 before(async () => {
   dotenv.config({ path: `${__dirname}/../../test.env` });
@@ -17,13 +18,6 @@ afterEach(async () => {
   await repository.clear();
   const clear = await repository.count();
   expect(clear).to.equal(0);
-});
-
-describe('Query test', function () {
-  it('should query Hello', async () => {
-    const query = await queryRequest(`query { hello }`);
-    expect(query.body.data.hello).to.equal('hello world');
-  });
 });
 
 const userCreation = (query) => {
@@ -234,5 +228,24 @@ describe('Login test', function () {
     const passwordError = wrongPassword.body.errors[0];
     expect(passwordError.message).to.equal('Senha incorreta');
     expect(passwordError.code).to.equal(400);
+  });
+});
+
+describe('User list test', function () {
+  it('shoul query an certain amount of users', async () => {
+    await savingUser();
+    const page = await userCreation(`
+    query{
+      users(quantity: 5, page: 5) {
+        list  {
+          name
+        }pageAfter
+        pageBefore
+        shown
+      }
+    }
+    `);
+    console.log(page.body.data.users.list);
+    expect(page.body.data.users.list).;
   });
 });

@@ -1,9 +1,8 @@
 import { User } from './entity/User';
 import { getRepository } from 'typeorm';
-import { UserInputError } from 'apollo-server';
 import { hash } from 'bcrypt';
 import { CustomError } from './errors';
-import { formatError } from './errors';
+import { UserInput } from './schema-types';
 
 export const resolvers = {
   Query: {
@@ -12,20 +11,20 @@ export const resolvers = {
     },
   },
   Mutation: {
-    createUser: async (_: string, { name, email, password, birthDate }) => {
+    createUser: async (_: string, { data: args }: { data: UserInput }) => {
       const repository = getRepository(User);
 
       const user = new User();
-
-      user.name = name;
-      user.email = email;
-      user.birthDate = birthDate;
+      console.log();
+      user.name = args.name;
+      user.email = args.email;
+      user.birthDate = args.birthDate;
 
       let validPassword = true;
       let validEmail = true;
 
       const sameEmail = await repository.find({ email: user.email });
-      const originalPassword = password;
+      const originalPassword = args.password;
 
       if (originalPassword.length < 7) {
         validPassword = false;

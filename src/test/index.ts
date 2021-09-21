@@ -5,6 +5,7 @@ import supertest = require('supertest');
 import { expect } from 'chai';
 import { User } from '../entity/User';
 import { getRepository } from 'typeorm';
+import { UserInput } from '../schema-types';
 
 before(async () => {
   dotenv.config({ path: `${__dirname}/../../test.env` });
@@ -25,20 +26,23 @@ describe('Query test', function () {
   });
 });
 
-const userCreation = (query) => {
+const userCreation = (query, variables) => {
   return supertest(`http://localhost:${process.env.PORT}`).post('/').send({
     query,
+    variables,
   });
 };
 
-const mutation = `mutation($data:String) {
-  createUser(data:$data){
-    name
-    email
-    birthDate
-    id
-  }
-}`;
+const mutation = `
+    mutation CreateUser($data: UserInput!) {
+      createUser(data: $data) {
+        id
+        name
+        email
+        birthDate
+      }
+    }
+  `;
 
 describe('Database test', function () {
   afterEach(async () => {
@@ -49,9 +53,13 @@ describe('Database test', function () {
   });
 
   it('should send an input, check the response and check if the user was creatred in the database', async () => {
-    const $data = 'name: "test_name", email: "test_name@email.com", password: "senha1", birthDate: "05/12/1999"';
-    const send = await userCreation(mutation);
-    console.log(send);
+    const data: UserInput = {
+      name: 'test_name',
+      email: 'test_name@email.com',
+      password: 'senhaok1',
+      birthDate: '05/12/1999',
+    };
+    const send = await userCreation(mutation, { data });
 
     expect(send.statusCode).to.equal(200);
 
@@ -72,51 +80,47 @@ describe('Database test', function () {
   });
 });
 
-describe('Error test', function () {
+describe('password error test', function () {
   it('should return a password error', async () => {
-    const shortPassword = await userCreation(
-      `mutation{
-        createUser(name: "test_name", email: "test_name@email.com", password: "senha1", birthDate: "05/12/1999"){
-          name
-          email
-          birthDate
-          id
-        }
-      }`,
-    );
+    let data = {
+      name: 'test_name',
+      email: 'test_name@email.com',
+      password: 'senha1',
+      birthDate: '05/12/1999',
+    };
 
+    const shortPassword = await userCreation(mutation, { data });
     const passwordError = shortPassword.body.errors[0];
     expect(passwordError.message).to.equal('Senha inválida');
     expect(passwordError.code).to.equal(400);
 
-    const noNumberPassword = await userCreation(
-      `mutation{
-        createUser(name: "test_name", email: "test_name@email.com", password: "senhasenha", birthDate: "05/12/1999"){
-          name
-          email
-          birthDate
-          id
-        }
-      }`,
-    );
+    data = {
+      name: 'test_name',
+      email: 'test_name@email.com',
+      password: 'senhanotok',
+      birthDate: '05/12/1999',
+    };
+
+    const noNumberPassword = await userCreation(mutation, { data });
     const passwordError2 = noNumberPassword.body.errors[0];
     expect(passwordError2.message).to.equal('Senha inválida');
     expect(passwordError2.code).to.equal(400);
 
-    const noLetterPassword = await userCreation(
-      `mutation{
-        createUser(name: "test_name", email: "test_name@email.com", password: "123456789", birthDate: "05/12/1999"){
-          name
-          email
-          birthDate
-          id
-        }
-      }`,
-    );
+    data = {
+      name: 'test_name',
+      email: 'test_name@email.com',
+      password: '12345678',
+      birthDate: '05/12/1999',
+    };
+
+    const noLetterPassword = await userCreation(mutation, { data });
+
     const passwordError3 = noLetterPassword.body.errors[0];
     expect(passwordError3.message).to.equal('Senha inválida');
     expect(passwordError3.code).to.equal(400);
   });
+});
+describe('email error test', function () {
   it('should return an email error ', async () => {
     const repository = getRepository(User);
     const user = new User();
@@ -126,16 +130,14 @@ describe('Error test', function () {
     user.birthDate = '05/12/1999';
     repository.save(user);
 
-    const secondUser = await userCreation(
-      `mutation{
-        createUser(name: "test_name2", email: "test_name@email.com", password: "senhaok2", birthDate: "06/12/1999"){
-          name
-          email
-          birthDate
-          id
-        }
-      }`,
-    );
+    const data: UserInput = {
+      name: 'test_name2',
+      email: user.email,
+      password: 'senhaok2',
+      birthDate: '06/12/1999',
+    };
+
+    const secondUser = await userCreation(mutation, { data });
     const emailError = secondUser.body.errors[0];
     expect(emailError.message).to.equal('Esse e-mail já está cadastrado');
     expect(emailError.code).to.equal(400);

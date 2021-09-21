@@ -74,11 +74,7 @@ describe('User creation test', function () {
   });
 });
 
-<<<<<<< HEAD
 describe('password error test', function () {
-=======
-describe('input error test', function () {
->>>>>>> c580037... implementacao dos testes
   it('should return a password error', async () => {
     let data = {
       name: 'test_name',
@@ -142,7 +138,7 @@ describe('email error test', function () {
   });
 });
 describe('Login test', function () {
-  it('Should check the login setup', async () => {
+  it('Should make the login and check the return and the token', async () => {
     const repository = getRepository(User);
     const user = new User();
     user.name = 'test_name';
@@ -170,9 +166,10 @@ describe('Login test', function () {
     expect(login.user.name).to.equal('test_name');
     expect(login.user.email).to.equal('test_name@email.com');
     expect(login.user.birthDate).to.equal('05/12/1999');
-    expect(login.user.id).to.greaterThan(0);
+    expect(login.user.id).to.equal(user.id);
     expect(login.token).to.equal('eyJhbGciOiJIUzI1NiJ9.dmVyaWZ5aWVk.JmT4Z2ZWJmtxlnaApsxlOB463KagGESrvLV59tonjfY');
   });
+
   it('should return a login error', async () => {
     const repository = getRepository(User);
     const user = new User();
@@ -198,7 +195,7 @@ describe('Login test', function () {
 
     const emailError = inexistingEmail.body.errors[0];
     expect(emailError.message).to.equal('Email não cadastrado');
-    expect(emailError.code).to.equal(400);
+    expect(emailError.code).to.equal(404);
 
     const wrongPassword = await userCreation(`
       mutation{
@@ -215,6 +212,6 @@ describe('Login test', function () {
     `);
     const passwordError = wrongPassword.body.errors[0];
     expect(passwordError.message).to.equal('Senha incorreta');
-    expect(passwordError.code).to.equal(400);
-    });
+    expect(passwordError.code).to.equal(401);
+  });
 });

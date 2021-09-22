@@ -1,6 +1,7 @@
 import 'reflect-metadata';
 import { createConnection } from 'typeorm';
 import { ApolloServer } from 'apollo-server';
+import { formatError } from './errors';
 
 import { typeDefs } from './schema';
 import { resolvers } from './resolver';
@@ -13,7 +14,7 @@ export const startServer = async () => {
     synchronize: true,
   });
 
-  const server = new ApolloServer({ typeDefs, resolvers });
+  const server = new ApolloServer({ typeDefs, resolvers, formatError });
   const { url } = await server.listen({ port: process.env.PORT });
   console.log(`Server running on: ${url}`);
 };

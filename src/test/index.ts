@@ -1,13 +1,12 @@
 import * as dotenv from 'dotenv';
 import { startServer } from '../setup';
-import { queryRequest } from './individual-tests/query-test';
-import supertest = require('supertest');
+import { createMutation, loginMutation, queryRequest, userCreation } from './constants';
 import { expect } from 'chai';
 import { User } from '../entity/User';
 import { getRepository } from 'typeorm';
 import { UserInput, LonginInput } from '../schema-types';
 import { hash } from 'bcrypt';
-import { verify } from 'jsonwebtoken';
+import { verify, sign } from 'jsonwebtoken';
 
 before(async () => {
   dotenv.config({ path: `${__dirname}/../../test.env` });
@@ -28,38 +27,7 @@ describe('Query test', function () {
   });
 });
 
-const userCreation = (query, variables) => {
-  return supertest(`http://localhost:${process.env.PORT}`).post('/').send({
-    query,
-    variables,
-  });
-};
-
-const createMutation = `
-  mutation CreateUser($data: UserInput!) {
-    createUser(data: $data) {
-      id
-      name
-      email
-      birthDate
-    }
-  }
-`;
-
-const loginMutation = `
-  mutation ($data : LoginInput!){
-    login(data: $data) {
-      user {
-      name
-      email
-      birthDate
-      id
-      } 
-      token
-    }
-  }
-`;
-describe('Database test', function () {
+describe('createUser mutation', function () {
   it('should send an input, check the response and check if the user was creatred in the database', async () => {
     const data: UserInput = {
       name: 'test_name',
@@ -67,7 +35,9 @@ describe('Database test', function () {
       password: 'senhaok1',
       birthDate: '05/12/1999',
     };
-    const send = await userCreation(createMutation, { data });
+
+    const token = sign({ id: 1 }, 'supersecret');
+    const send = await userCreation(createMutation, { data }, token);
 
     expect(send.statusCode).to.equal(200);
 
@@ -97,7 +67,8 @@ describe('password error test', function () {
       birthDate: '05/12/1999',
     };
 
-    const shortPassword = await userCreation(createMutation, { data });
+    const token = sign({ id: 1 }, 'supersecret');
+    const shortPassword = await userCreation(createMutation, { data }, token);
     const passwordError = shortPassword.body.errors[0];
     expect(passwordError.message).to.equal('Senha inválida');
     expect(passwordError.code).to.equal(400);
@@ -109,7 +80,7 @@ describe('password error test', function () {
       birthDate: '05/12/1999',
     };
 
-    const noNumberPassword = await userCreation(createMutation, { data });
+    const noNumberPassword = await userCreation(createMutation, { data }, token);
     const passwordError2 = noNumberPassword.body.errors[0];
     expect(passwordError2.message).to.equal('Senha inválida');
     expect(passwordError2.code).to.equal(400);
@@ -121,7 +92,7 @@ describe('password error test', function () {
       birthDate: '05/12/1999',
     };
 
-    const noLetterPassword = await userCreation(createMutation, { data });
+    const noLetterPassword = await userCreation(createMutation, { data }, token);
 
     const passwordError3 = noLetterPassword.body.errors[0];
     expect(passwordError3.message).to.equal('Senha inválida');
@@ -145,7 +116,8 @@ describe('email error test', function () {
       birthDate: '06/12/1999',
     };
 
-    const secondUser = await userCreation(createMutation, { data });
+    const token = sign({ id: 1 }, 'supersecret');
+    const secondUser = await userCreation(createMutation, { data }, token);
     const emailError = secondUser.body.errors[0];
     expect(emailError.message).to.equal('Esse e-mail já está cadastrado');
     expect(emailError.code).to.equal(400);
@@ -166,6 +138,7 @@ describe('Login test', function () {
       email: user.email,
       password: 'senhaok1',
     };
+
     const loginResponse = await userCreation(loginMutation, { data });
 
     const login = loginResponse.body.data.login;
@@ -175,7 +148,7 @@ describe('Login test', function () {
     expect(login.user.birthDate).to.equal('05/12/1999');
     expect(login.user.id).to.equal(user.id);
     const valid = verify(login.token, 'supersecret');
-    expect(valid).to.equal(user.id);
+    expect(valid).to.equal(`${user.id}`);
   });
 
   it('should return an email login error', async () => {

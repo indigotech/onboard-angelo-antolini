@@ -75,7 +75,7 @@ export const resolvers = {
       if (!match) {
         throw new CustomError('Senha incorreta', 401);
       }
-      const token = sign(`${userData.id}`, 'supersecret', { expiresIn: 60 });
+      const token = sign(`${userData.id}`, 'supersecret');
       return { user: userData, token: token };
     },
   },

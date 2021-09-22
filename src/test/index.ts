@@ -44,14 +44,7 @@ const mutation = `
     }
   `;
 
-describe('Database test', function () {
-  afterEach(async () => {
-    const repository = getRepository(User);
-    await repository.clear();
-    const clear = await repository.count();
-    expect(clear).to.equal(0);
-  });
-
+describe('User creation test', function () {
   it('should send an input, check the response and check if the user was creatred in the database', async () => {
     const data: UserInput = {
       name: 'test_name',
@@ -71,7 +64,7 @@ describe('Database test', function () {
     expect(user.id).to.exist;
 
     const repository = getRepository(User);
-    const test = await repository.findOne({ name: 'test_name' });
+    const test = await repository.findOne({ id: user.id });
 
     expect(test.name).to.equal('test_name');
     expect(test.email).to.equal('test_name@email.com');

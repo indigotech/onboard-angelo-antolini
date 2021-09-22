@@ -15,7 +15,7 @@ export const resolvers = {
       const repository = getRepository(User);
 
       const user = new User();
-      console.log();
+
       user.name = args.name;
       user.email = args.email;
       user.birthDate = args.birthDate;

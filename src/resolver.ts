@@ -30,6 +30,7 @@ export const resolvers = {
       user.birthDate = args.birthDate;
 
       let validPassword = true;
+      let newEmail = true;
       let validEmail = true;
 
       const sameEmail = await repository.find({ email: user.email });
@@ -41,26 +42,32 @@ export const resolvers = {
       } else if (args.password.search(/[a-z]/) == -1 && args.password.search(/[A-Z]/) == -1) {
         validPassword = false;
       } else if (sameEmail.length !== 0) {
+        newEmail = false;
+      }
+
+      const regexEmail = /^\w+([\.-]?\w+)*@\w+([\.-]?\w+)*(\.\w{2,3})+$/;
+      if (!user.email.match(regexEmail)) {
         validEmail = false;
       }
 
-      if (validPassword && validEmail) {
-        const saltRounds = 0;
-        const hashPassword = await hash(args.password, saltRounds);
-
-        user.password = hashPassword;
-        const response = await repository.save(user);
-
-        return response;
-      } else if (!validEmail) {
+      if (!newEmail) {
         throw new CustomError(
-          'Esse e-mail já está cadastrado',
+          'E-mail já cadastrado',
           400,
           'you can`t have more then one user in the database with the same email',
         );
+      } else if (!validEmail) {
+        throw new CustomError('formato de e-mail inválido', 400);
       } else if (!validPassword) {
         throw new CustomError('Senha inválida', 400, 'the password doesn`t have de minimum requirements');
       }
+      const saltRounds = 0;
+      const hashPassword = await hash(args.password, saltRounds);
+
+      user.password = hashPassword;
+      const response = await repository.save(user);
+
+      return response;
     },
 
     login: async (_, { data: args }: { data: LonginInput }) => {

@@ -91,7 +91,7 @@ describe('createUser mutation', function () {
     user.birthDate = '05/12/1999';
     repository.save(user);
 
-    const data: UserInput = {
+    let data: UserInput = {
       name: 'test_name2',
       email: user.email,
       password: 'senhaok2',
@@ -101,7 +101,19 @@ describe('createUser mutation', function () {
     const token = sign({ id: 1 }, 'supersecret');
     const secondUser = await userCreation(createMutation, { data }, token);
     const emailError = secondUser.body.errors[0];
-    expect(emailError.message).to.equal('Esse e-mail já está cadastrado');
+    expect(emailError.message).to.equal('E-mail já cadastrado');
     expect(emailError.code).to.equal(400);
+
+    data = {
+      name: 'test_name',
+      email: 'invalidemail',
+      password: 'senhaok1',
+      birthDate: '05/12/1999',
+    };
+
+    const invalidFormat = await userCreation(createMutation, { data }, token);
+    const emailFormatError = invalidFormat.body.errors[0];
+    expect(emailFormatError.message).to.equal('formato de e-mail inválido');
+    expect(emailFormatError.code).to.equal(400);
   });
 });

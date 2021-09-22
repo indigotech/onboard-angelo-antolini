@@ -7,6 +7,7 @@ import { User } from '../entity/User';
 import { getRepository } from 'typeorm';
 import { UserInput, LonginInput } from '../schema-types';
 import { hash } from 'bcrypt';
+import { verify } from 'jsonwebtoken';
 
 before(async () => {
   dotenv.config({ path: `${__dirname}/../../test.env` });
@@ -152,7 +153,7 @@ describe('email error test', function () {
 });
 
 describe('Login test', function () {
-  it('Should make the login and check the return and the token', async () => {
+  it('Should make the login and check the return and a valid token', async () => {
     const repository = getRepository(User);
     const user = new User();
     user.name = 'test_name';
@@ -173,7 +174,8 @@ describe('Login test', function () {
     expect(login.user.email).to.equal('test_name@email.com');
     expect(login.user.birthDate).to.equal('05/12/1999');
     expect(login.user.id).to.equal(user.id);
-    expect(login.token).to.equal('eyJhbGciOiJIUzI1NiJ9.dmVyaWZ5aWVk.JmT4Z2ZWJmtxlnaApsxlOB463KagGESrvLV59tonjfY');
+    const valid = verify(login.token, 'supersecret');
+    expect(valid).to.equal(user.id);
   });
 
   it('should return an email login error', async () => {

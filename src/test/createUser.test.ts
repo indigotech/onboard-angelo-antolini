@@ -1,30 +1,15 @@
-import * as dotenv from 'dotenv';
-import { startServer } from '../setup';
-import { createMutation, loginMutation, queryRequest, userCreation } from './constants';
+import { createMutation, userCreation } from './constants';
 import { expect } from 'chai';
 import { User } from '../entity/User';
 import { getRepository } from 'typeorm';
-import { UserInput, LonginInput } from '../schema-types';
-import { hash } from 'bcrypt';
-import { verify, sign } from 'jsonwebtoken';
-
-before(async () => {
-  dotenv.config({ path: `${__dirname}/../../test.env` });
-  await startServer();
-});
+import { UserInput } from '../schema-types';
+import { sign } from 'jsonwebtoken';
 
 afterEach(async () => {
   const repository = getRepository(User);
   await repository.clear();
   const clear = await repository.count();
   expect(clear).to.equal(0);
-});
-
-describe('Query test', function () {
-  it('should query Hello', async () => {
-    const query = await queryRequest(`query { hello }`);
-    expect(query.body.data.hello).to.equal('hello world');
-  });
 });
 
 describe('createUser mutation', function () {
@@ -56,9 +41,7 @@ describe('createUser mutation', function () {
     expect(test.birthDate).to.equal('05/12/1999');
     expect(test.id).to.greaterThan(0);
   });
-});
 
-describe('password error test', function () {
   it('should return a password error', async () => {
     let data = {
       name: 'test_name',
@@ -98,8 +81,7 @@ describe('password error test', function () {
     expect(passwordError3.message).to.equal('Senha inválida');
     expect(passwordError3.code).to.equal(400);
   });
-});
-describe('email error test', function () {
+
   it('should return an email error ', async () => {
     const repository = getRepository(User);
     const user = new User();
@@ -121,72 +103,5 @@ describe('email error test', function () {
     const emailError = secondUser.body.errors[0];
     expect(emailError.message).to.equal('Esse e-mail já está cadastrado');
     expect(emailError.code).to.equal(400);
-  });
-});
-
-describe('Login test', function () {
-  it('Should make the login and check the return and a valid token', async () => {
-    const repository = getRepository(User);
-    const user = new User();
-    user.name = 'test_name';
-    user.email = 'test_name@email.com';
-    user.password = await hash('senhaok1', 0);
-    user.birthDate = '05/12/1999';
-    await repository.save(user);
-
-    const data: LonginInput = {
-      email: user.email,
-      password: 'senhaok1',
-    };
-
-    const loginResponse = await userCreation(loginMutation, { data });
-
-    const login = loginResponse.body.data.login;
-
-    expect(login.user.name).to.equal('test_name');
-    expect(login.user.email).to.equal('test_name@email.com');
-    expect(login.user.birthDate).to.equal('05/12/1999');
-    expect(login.user.id).to.equal(user.id);
-    const valid = verify(login.token, 'supersecret');
-    expect(valid).to.equal(`${user.id}`);
-  });
-
-  it('should return an email login error', async () => {
-    const repository = getRepository(User);
-    const user = new User();
-    user.name = 'test_name';
-    user.email = 'test_name@email.com';
-    user.password = await hash('senhaok1', 0);
-    user.birthDate = '05/12/1999';
-    await repository.save(user);
-
-    const data: LonginInput = {
-      email: 'wrong_test_name@email.com',
-      password: 'senhaok1',
-    };
-    const inexistingEmail = await userCreation(loginMutation, { data });
-
-    const emailError = inexistingEmail.body.errors[0];
-    expect(emailError.message).to.equal('Email não cadastrado');
-    expect(emailError.code).to.equal(404);
-  });
-
-  it('should return a password login error', async () => {
-    const repository = getRepository(User);
-    const user = new User();
-    user.name = 'test_name';
-    user.email = 'test_name@email.com';
-    user.password = await hash('senhaok1', 0);
-    user.birthDate = '05/12/1999';
-    await repository.save(user);
-
-    const data: LonginInput = {
-      email: user.email,
-      password: 'senhanotok1',
-    };
-    const wrongPassword = await userCreation(loginMutation, { data });
-    const passwordError = wrongPassword.body.errors[0];
-    expect(passwordError.message).to.equal('Senha incorreta');
-    expect(passwordError.code).to.equal(401);
   });
 });

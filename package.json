@@ -4,7 +4,7 @@
    "description": "Projeto Onboard",
    "main": "index.js",
    "scripts": {
-      "test": "mocha --require ts-node/register src/test/index.ts",
+      "test": "mocha --require ts-node/register src/**/*.test.ts",
       "start": "ts-node src/index.ts"
    },
    "repository": {

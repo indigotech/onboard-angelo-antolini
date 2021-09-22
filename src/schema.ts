@@ -2,7 +2,8 @@ import { gql } from 'apollo-server';
 
 export const typeDefs = gql`
   type Query {
-    user(id: Int!): outputUser!
+    user(id: Int!): User!
+    hello: String!
   }
   type Mutation {
     createUser(data: UserInput!): User!

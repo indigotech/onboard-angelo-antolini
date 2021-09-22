@@ -4,18 +4,8 @@ import { compare, hash } from 'bcrypt';
 import { CustomError } from './errors';
 import { LonginInput, UserInput } from './schema-types';
 import { sign, verify } from 'jsonwebtoken';
-import jwt = require('jsonwebtoken');
 
 export const resolvers = {
-  Login: {
-    user: (parents) => {
-      return parents;
-    },
-    token: () => {
-      const token = jwt.sign('verifyied', 'supersecret');
-      return token;
-    },
-  },
   Query: {
     user: async (_, { id }) => {
       const repository = getRepository(User);
@@ -25,6 +15,10 @@ export const resolvers = {
         throw new CustomError('Usuário não encontrado', 404);
       }
       return resp;
+    },
+
+    hello: (): string => {
+      return 'hello world';
     },
   },
   Mutation: {
@@ -98,6 +92,7 @@ export const resolvers = {
       if (!match) {
         throw new CustomError('Senha incorreta', 401);
       }
+
       const token = sign(`${userData.id}`, 'supersecret');
       return { user: userData, token: token };
     },

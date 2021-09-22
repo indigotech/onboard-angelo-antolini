@@ -1,8 +1,9 @@
 import supertest = require('supertest');
 
-export const queryRequest = (query: string) => {
+export const queryRequest = (query: string, variables) => {
   return supertest(`http://localhost:${process.env.PORT}`).post('/').send({
     query,
+    variables,
   });
 };
 
@@ -37,6 +38,16 @@ mutation ($data : LoginInput!){
     id
     } 
     token
+  }
+}
+`;
+
+export const queryUser = `
+query ($id: Int!){
+  user(id: $id){
+    name
+    email
+    birthDate
   }
 }
 `;

@@ -5,9 +5,23 @@ import { CustomError } from './errors';
 import { LonginInput, UserInput } from './schema-types';
 import { sign, verify } from 'jsonwebtoken';
 
+function verifyToken(context) {
+  if (!context.token) {
+    throw new CustomError('Voce nao tem permissao para efetuar essa açao', 404, 'token not found');
+  }
+
+  console.log(verify(context.token, 'supersecret'));
+
+  if (!verify(context.token, 'supersecret')) {
+    throw new CustomError('Ação nao autorizada', 401);
+  }
+}
+
 export const resolvers = {
   Query: {
-    user: async (_, { id }) => {
+    user: async (_, { id }, context) => {
+      verifyToken(context);
+
       const repository = getRepository(User);
       const resp = await repository.findOne({ id });
 
@@ -21,21 +35,28 @@ export const resolvers = {
       return 'hello world';
     },
 
-    users: async (_: string, { quantity, page }) => {
+    users: async (_: string, { quantity, page }, context) => {
+      verifyToken(context);
+
       let pageBefore = false;
       let pageAfter = false;
       let shown = '';
+
       const repository = getRepository(User);
+
       quantity == undefined ? (quantity = 10) : quantity;
       page == undefined ? (page = 0) : (page += -1);
       const skip = page * quantity;
+
       const list = await repository.createQueryBuilder().orderBy('name').limit(quantity).offset(skip).getMany();
+
       if (page > 0) {
         pageBefore = true;
       }
       if ((await repository.findOne({ id: skip + quantity + 1 })) != undefined) {
         pageAfter = true;
       }
+
       const totalUsers = await repository.count();
       if (totalUsers > skip + quantity) {
         shown = `users:${skip + 1}-${skip + quantity}/${totalUsers}`;
@@ -48,14 +69,7 @@ export const resolvers = {
   },
   Mutation: {
     createUser: async (_, { data: args }: { data: UserInput }, context) => {
-      if (!context.token) {
-        throw new CustomError('Voce nao tem permissao para efetuar essa açao', 404, 'token not found');
-      }
-
-      const valid = verify(context.token, 'supersecret');
-      if (!valid) {
-        throw new CustomError('Ação nao autorizada', 401);
-      }
+      verifyToken(context);
 
       const repository = getRepository(User);
       const user = new User();

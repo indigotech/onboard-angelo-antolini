@@ -4,3 +4,8 @@ export interface UserInput {
   password: string;
   birthDate: string;
 }
+
+export interface LonginInput {
+  email: string;
+  password: string;
+}

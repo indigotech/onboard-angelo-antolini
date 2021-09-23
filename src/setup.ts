@@ -14,7 +14,14 @@ export const startServer = async () => {
     synchronize: true,
   });
 
-  const server = new ApolloServer({ typeDefs, resolvers, formatError });
+  const server = new ApolloServer({
+    typeDefs,
+    resolvers,
+    context: ({ req }) => ({
+      token: req.headers.authorization,
+    }),
+    formatError,
+  });
   const { url } = await server.listen({ port: process.env.PORT });
   console.log(`Server running on: ${url}`);
 };

@@ -3,14 +3,7 @@ import { User } from '../entity/User';
 import { getRepository } from 'typeorm';
 import { queryRequest, queryUser } from './constants';
 
-afterEach(async () => {
-  const repository = getRepository(User);
-  await repository.clear();
-  const clear = await repository.count();
-  expect(clear).to.equal(0);
-});
-
-describe('Query user test', function () {
+export const queryUserTest = describe('Query user test', function () {
   it('should query user by id', async () => {
     const repository = getRepository(User);
 

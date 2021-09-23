@@ -6,6 +6,7 @@ import { getRepository } from 'typeorm';
 import { queryTest } from './query-hello.test';
 import { createUserTest } from './createUser.test';
 import { loginTest } from './login.test';
+import { queryUserTest } from './user-query.test';
 
 before(async () => {
   dotenv.config({ path: `${__dirname}/../../test.env` });
@@ -22,3 +23,4 @@ afterEach(async () => {
 queryTest;
 loginTest;
 createUserTest;
+queryUserTest;

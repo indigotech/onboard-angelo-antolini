@@ -21,6 +21,17 @@ export const typeDefs = gql`
     email: String!
     birthDate: String!
     id: Int!
+    adress: Address
+  }
+
+  type Address {
+    CEP: String
+    street: String
+    streetNumber: Int
+    complement: String
+    neighborhood: String
+    city: String
+    state: String
   }
 
   input UserInput {
@@ -28,6 +39,7 @@ export const typeDefs = gql`
     email: String
     password: String
     birthDate: String
+    adress: Adress
   }
 
   input LoginInput {

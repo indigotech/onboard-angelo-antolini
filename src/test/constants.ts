@@ -1,10 +1,13 @@
 import supertest = require('supertest');
 
-export const queryRequest = (query: string, variables) => {
-  return supertest(`http://localhost:${process.env.PORT}`).post('/').send({
-    query,
-    variables,
-  });
+export const queryRequest = (query: string, variables, token?) => {
+  return supertest(`http://localhost:${process.env.PORT}`)
+    .post('/')
+    .set('Authorization', token ?? '')
+    .send({
+      query,
+      variables,
+    });
 };
 
 export const userCreation = (query, variables, token?) => {

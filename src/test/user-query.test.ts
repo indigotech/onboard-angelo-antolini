@@ -2,6 +2,7 @@ import { expect } from 'chai';
 import { User } from '../entity/User';
 import { getRepository } from 'typeorm';
 import { queryRequest, queryUser } from './constants';
+import { sign } from 'jsonwebtoken';
 
 export const queryUserTest = describe('Query user test', function () {
   it('should query user by id', async () => {
@@ -16,7 +17,8 @@ export const queryUserTest = describe('Query user test', function () {
     await repository.save(user);
 
     const idQuery = (await repository.findOne({ name: 'test_name' })).id;
-    const findUser = await queryRequest(queryUser, { id: idQuery });
+    const token = sign({ id: idQuery }, 'supersecret');
+    const findUser = await queryRequest(queryUser, { id: idQuery }, token);
 
     const queryiedUser = findUser.body.data.user;
     expect(queryiedUser.name).to.equal('test_name');
@@ -25,7 +27,8 @@ export const queryUserTest = describe('Query user test', function () {
   });
 
   it('should return a not found id error', async () => {
-    const findUser = await queryRequest(queryUser, { id: 1 });
+    const token = sign({ id: 1 }, 'supersecret');
+    const findUser = await queryRequest(queryUser, { id: 1 }, token);
 
     const queryError = findUser.body.errors[0];
     expect(queryError.message).to.equal('Usuário não encontrado');

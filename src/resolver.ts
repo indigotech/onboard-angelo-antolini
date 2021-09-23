@@ -10,8 +10,6 @@ function verifyToken(context) {
     throw new CustomError('Voce nao tem permissao para efetuar essa açao', 404, 'token not found');
   }
 
-  console.log(verify(context.token, 'supersecret'));
-
   if (!verify(context.token, 'supersecret')) {
     throw new CustomError('Ação nao autorizada', 401);
   }

@@ -1,5 +1,3 @@
-import * as dotenv from 'dotenv';
-import { startServer } from '../setup';
 import { loginMutation, userCreation } from './constants';
 import { expect } from 'chai';
 import { User } from '../entity/User';
@@ -8,19 +6,7 @@ import { LonginInput } from '../schema-types';
 import { hash } from 'bcrypt';
 import { verify } from 'jsonwebtoken';
 
-before(async () => {
-  dotenv.config({ path: `${__dirname}/../../test.env` });
-  await startServer();
-});
-
-afterEach(async () => {
-  const repository = getRepository(User);
-  await repository.clear();
-  const clear = await repository.count();
-  expect(clear).to.equal(0);
-});
-
-describe('Login test', function () {
+export const loginTest = describe('Login test', function () {
   it('Should make the login and check the return and a valid token', async () => {
     const repository = getRepository(User);
     const user = new User();

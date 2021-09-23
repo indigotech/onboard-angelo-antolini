@@ -5,14 +5,7 @@ import { getRepository } from 'typeorm';
 import { UserInput } from '../schema-types';
 import { sign } from 'jsonwebtoken';
 
-afterEach(async () => {
-  const repository = getRepository(User);
-  await repository.clear();
-  const clear = await repository.count();
-  expect(clear).to.equal(0);
-});
-
-describe('createUser mutation', function () {
+export const createUserTest = describe('createUser mutation', function () {
   it('should send an input, check the response and check if the user was creatred in the database', async () => {
     const data: UserInput = {
       name: 'test_name',

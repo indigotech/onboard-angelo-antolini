@@ -43,6 +43,13 @@ export const resolvers = {
 
       const repository = getRepository(User);
 
+      if (page === 0) {
+        throw new CustomError('Esta página não existe', 404);
+      }
+      if (quantity === 0) {
+        throw new CustomError('Quantidade inválida de usuários', 400);
+      }
+
       if (!quantity) {
         quantity = 10;
       }
@@ -57,6 +64,11 @@ export const resolvers = {
 
       const totalUsers = await repository.count();
       const pastUsers = (page + 1) * quantity;
+      const totalPages = Math.round(totalUsers / quantity);
+
+      if (page > totalPages) {
+        throw new CustomError('Esta página não existe', 404, 'page not found');
+      }
 
       if (page > 0) {
         pageBefore = true;

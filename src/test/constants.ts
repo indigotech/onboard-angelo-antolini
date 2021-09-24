@@ -66,7 +66,7 @@ export const queryUsers = `
       }
       pageBefore
       pageAfter
-      shown
+      totalUsers
     }
   }
 `;

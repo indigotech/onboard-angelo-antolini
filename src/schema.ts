@@ -4,7 +4,7 @@ export const typeDefs = gql`
   type Query {
     user(id: Int!): User!
     hello: String!
-    users(quantity: Int, page: Int): Pagination
+    users(data: ListInput): Pagination
   }
   type Mutation {
     createUser(data: UserInput!): User!
@@ -40,5 +40,10 @@ export const typeDefs = gql`
     pageBefore: Boolean
     pageAfter: Boolean
     totalUsers: String
+  }
+
+  input ListInput {
+    quantity: Int
+    page: Int
   }
 `;

@@ -20,7 +20,8 @@ afterEach(async () => {
   expect(clear).to.equal(0);
 });
 
-queryTest;
-loginTest;
-createUserTest;
-queryUserTest;
+// queryTest;
+// loginTest;
+// createUserTest;
+// queryUserTest;
+require('./users-query.test');

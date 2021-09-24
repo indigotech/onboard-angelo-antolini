@@ -9,3 +9,8 @@ export interface LonginInput {
   email: string;
   password: string;
 }
+
+export interface ListInput {
+  quantity: number;
+  page: number;
+}

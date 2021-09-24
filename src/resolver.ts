@@ -7,7 +7,7 @@ import { sign, verify } from 'jsonwebtoken';
 
 function verifyToken(context) {
   if (!context.token) {
-    throw new CustomError('Voce nao tem permissao para efetuar essa açao', 404, 'token not found');
+    throw new CustomError('Voce nao tem permissao para efetuar essa açao', 401, 'token not found');
   }
 
   if (!verify(context.token, 'supersecret')) {
@@ -38,31 +38,32 @@ export const resolvers = {
 
       let pageBefore = false;
       let pageAfter = false;
-      let shown = '';
 
       const repository = getRepository(User);
 
-      quantity == undefined ? (quantity = 10) : quantity;
-      page == undefined ? (page = 0) : (page += -1);
+      if (!quantity) {
+        quantity = 10;
+      }
+      if (!page) {
+        page = 0;
+      } else {
+        page += -1;
+      }
       const skip = page * quantity;
 
       const list = await repository.createQueryBuilder().orderBy('name').limit(quantity).offset(skip).getMany();
 
+      const totalUsers = await repository.count();
+      const pastUsers = (page + 1) * quantity;
+
       if (page > 0) {
         pageBefore = true;
       }
-      if ((await repository.findOne({ id: skip + quantity + 1 })) != undefined) {
+      if (pastUsers < totalUsers) {
         pageAfter = true;
       }
 
-      const totalUsers = await repository.count();
-      if (totalUsers > skip + quantity) {
-        shown = `users:${skip + 1}-${skip + quantity}/${totalUsers}`;
-      } else {
-        shown = `users:${skip + 1}-${totalUsers}/${totalUsers}`;
-      }
-
-      return { list: list, pageBefore: pageBefore, pageAfter: pageAfter, shown: shown };
+      return { list: list, pageBefore: pageBefore, pageAfter: pageAfter, totalUsers: totalUsers };
     },
   },
   Mutation: {

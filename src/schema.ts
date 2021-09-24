@@ -39,6 +39,6 @@ export const typeDefs = gql`
     list: [User]
     pageBefore: Boolean
     pageAfter: Boolean
-    shown: String
+    totalUsers: String
   }
 `;

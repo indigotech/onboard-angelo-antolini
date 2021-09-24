@@ -2,7 +2,6 @@ import * as faker from 'faker';
 import { User } from '../entity/User';
 import { getRepository } from 'typeorm';
 import * as dotenv from 'dotenv';
-import { startServer } from '../setup';
 import { createConnection } from 'typeorm';
 
 const savingUser = async () => {

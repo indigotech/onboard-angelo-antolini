@@ -5,7 +5,8 @@
    "main": "index.js",
    "scripts": {
       "test": "mocha --require ts-node/register src/test/index.ts",
-      "start": "ts-node src/index.ts"
+      "start": "ts-node src/index.ts",
+      "seed": "ts-node src/faker/index.ts"
    },
    "repository": {
       "type": "git",
@@ -32,6 +33,7 @@
       "typeorm": "0.2.37"
    },
    "devDependencies": {
+      "@types/faker": "5.5.8",
       "@types/bcrypt": "5.0.0",
       "@types/mocha": "9.0.0",
       "@types/chai": "4.2.21",
@@ -46,6 +48,7 @@
       "prettier": "2.3.2",
       "supertest": "6.1.6",
       "ts-node": "10.2.1",
-      "typescript": "4.4.2"
+      "typescript": "4.4.2",
+      "faker": "5.5.3"
    }
 }

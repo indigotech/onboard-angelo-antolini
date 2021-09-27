@@ -5,22 +5,70 @@ import { CustomError } from './errors';
 import { LonginInput, UserInput } from './schema-types';
 import { sign, verify } from 'jsonwebtoken';
 
+function verifyToken(context) {
+  if (!context.token) {
+    throw new CustomError('Voce nao tem permissao para efetuar essa açao', 401, 'token not found');
+  }
+
+  if (!verify(context.token, 'supersecret')) {
+    throw new CustomError('Ação nao autorizada', 401);
+  }
+}
+
 export const resolvers = {
   Query: {
+    user: async (_, { id }, context) => {
+      verifyToken(context);
+
+      const repository = getRepository(User);
+      const resp = await repository.findOne({ id });
+
+      if (!resp) {
+        throw new CustomError('Usuário não encontrado', 404);
+      }
+      return resp;
+    },
+
     hello: (): string => {
       return 'hello world';
+    },
+
+    users: async (_: string, { quantity, page }, context) => {
+      verifyToken(context);
+
+      let pageBefore = false;
+      let pageAfter = false;
+
+      const repository = getRepository(User);
+
+      if (!quantity) {
+        quantity = 10;
+      }
+      if (!page) {
+        page = 0;
+      } else {
+        page += -1;
+      }
+      const skip = page * quantity;
+
+      const list = await repository.createQueryBuilder().orderBy('name').limit(quantity).offset(skip).getMany();
+
+      const totalUsers = await repository.count();
+      const pastUsers = (page + 1) * quantity;
+
+      if (page > 0) {
+        pageBefore = true;
+      }
+      if (pastUsers < totalUsers) {
+        pageAfter = true;
+      }
+
+      return { list: list, pageBefore: pageBefore, pageAfter: pageAfter, totalUsers: totalUsers };
     },
   },
   Mutation: {
     createUser: async (_, { data: args }: { data: UserInput }, context) => {
-      if (!context.token) {
-        throw new CustomError('Voce nao tem permissao para efetuar essa açao', 404, 'token not found');
-      }
-
-      const valid = verify(context.token, 'supersecret');
-      if (!valid) {
-        throw new CustomError('Ação nao autorizada', 401);
-      }
+      verifyToken(context);
 
       const repository = getRepository(User);
       const user = new User();
@@ -82,6 +130,7 @@ export const resolvers = {
       if (!match) {
         throw new CustomError('Senha incorreta', 401);
       }
+
       const token = sign(`${userData.id}`, 'supersecret');
       return { user: userData, token: token };
     },

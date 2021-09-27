@@ -2,7 +2,9 @@ import { gql } from 'apollo-server';
 
 export const typeDefs = gql`
   type Query {
+    user(id: Int!): User!
     hello: String!
+    users(quantity: Int, page: Int): Pagination
   }
   type Mutation {
     createUser(data: UserInput!): User!
@@ -31,5 +33,12 @@ export const typeDefs = gql`
   input LoginInput {
     email: String
     password: String
+  }
+
+  type Pagination {
+    list: [User]
+    pageBefore: Boolean
+    pageAfter: Boolean
+    totalUsers: String
   }
 `;

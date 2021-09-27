@@ -3,10 +3,6 @@ import { startServer } from '../setup';
 import { expect } from 'chai';
 import { User } from '../entity/User';
 import { getRepository } from 'typeorm';
-import { queryTest } from './query-hello.test';
-import { createUserTest } from './createUser.test';
-import { loginTest } from './login.test';
-import { queryUserTest } from './user-query.test';
 
 before(async () => {
   dotenv.config({ path: `${__dirname}/../../test.env` });
@@ -20,7 +16,8 @@ afterEach(async () => {
   expect(clear).to.equal(0);
 });
 
-queryTest;
-loginTest;
-createUserTest;
-queryUserTest;
+require('./query-hello.test');
+require('./createUser.test');
+require('./login.test');
+require('./user-query.test');
+require('./users-query.test');

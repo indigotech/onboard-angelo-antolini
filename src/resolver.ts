@@ -2,7 +2,7 @@ import { User } from './entity/User';
 import { getRepository } from 'typeorm';
 import { compare, hash } from 'bcrypt';
 import { CustomError } from './errors';
-import { LonginInput, UserInput } from './schema-types';
+import { ListInput, LonginInput, UserInput } from './schema-types';
 import { sign, verify } from 'jsonwebtoken';
 
 function verifyToken(context) {
@@ -33,13 +33,22 @@ export const resolvers = {
       return 'hello world';
     },
 
-    users: async (_: string, { quantity, page }, context) => {
+    users: async (_: string, { data: args }: { data: ListInput }, context) => {
       verifyToken(context);
 
       let pageBefore = false;
       let pageAfter = false;
+      let quantity = args.quantity;
+      let page = args.page;
 
       const repository = getRepository(User);
+
+      if (page === 0) {
+        throw new CustomError('Esta página não existe', 404);
+      }
+      if (quantity === 0) {
+        throw new CustomError('Quantidade inválida de usuários', 400);
+      }
 
       if (!quantity) {
         quantity = 10;
@@ -51,10 +60,15 @@ export const resolvers = {
       }
       const skip = page * quantity;
 
-      const list = await repository.createQueryBuilder().orderBy('name').limit(quantity).offset(skip).getMany();
+      const list = await repository.createQueryBuilder().orderBy('name').limit(args.quantity).offset(skip).getMany();
 
       const totalUsers = await repository.count();
       const pastUsers = (page + 1) * quantity;
+      const totalPages = Math.round(totalUsers / quantity);
+
+      if (page > totalPages) {
+        throw new CustomError('Esta página não existe', 404, 'page not found');
+      }
 
       if (page > 0) {
         pageBefore = true;

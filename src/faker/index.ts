@@ -4,7 +4,7 @@ import { getRepository } from 'typeorm';
 
 export const savingUser = async () => {
   const repository = getRepository(User);
-  for (let i = 0; i < 2; i++) {
+  for (let i = 0; i < 50; i++) {
     const user = new User();
 
     user.name = faker.name.firstName(1);

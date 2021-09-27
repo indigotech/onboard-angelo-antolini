@@ -54,3 +54,19 @@ query ($id: Int!){
   }
 }
 `;
+
+export const queryUsers = `
+  query ($data: ListInput!){
+    users(data: $data) {
+      list{
+        name
+        email
+        birthDate
+        id
+      }
+      pageBefore
+      pageAfter
+      totalUsers
+    }
+  }
+`;
